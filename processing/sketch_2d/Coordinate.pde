@@ -13,7 +13,7 @@ class Coordinate {
     rotateY(YPR.x);
     stroke(255);
       fill(255, 100);
-      box(10,1,3);
+      box(10,1,3 );
     popMatrix();
   }
 

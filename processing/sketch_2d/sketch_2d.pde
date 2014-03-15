@@ -37,8 +37,8 @@ String[] rawData;
 
 
 void setup() {
-  size(1024, 800, OPENGL);
-  cam = new PeasyCam(this, 1000);
+  size(1400, 800, OPENGL);
+  cam = new PeasyCam(this, 100);
   colorMode(HSB);
 
   rawData = loadStrings("secondTry.csv");

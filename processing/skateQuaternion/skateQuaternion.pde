@@ -20,9 +20,9 @@ void setup(){
   cam = new PeasyCam(this, 1000);
   colorMode(HSB);
 
-  rawData = loadStrings("up_down.csv");
+  rawData = loadStrings("flip180_fast3.csv");
 
-  parseTextFile("up_down.csv");
+  parseTextFile("flip180_fast3.csv");
 }
 
 
@@ -64,6 +64,7 @@ void drawBoxes(){
 
 
 void parseTextFile(String _name){
+  println(rawData.length);
   yaw = new float[rawData.length];
   pitch = new float[rawData.length];
   roll = new float[rawData.length];
@@ -72,12 +73,29 @@ void parseTextFile(String _name){
     String[] thisRow = split(rawData[i], ",");
     
     yaw[i] = float(thisRow[0]);
-    pitch[i] = float(thisRow[1]);
-    roll[i] = float(thisRow[2]);
+    yaw[i] = yaw[i]*PI/180;
+//    String roundyaw = nf(yaw[i],0,3);
+//    yaw[i] = Float.valueOf(roundyaw).floatValue();
     
+    pitch[i] = float(thisRow[1]);
+    pitch[i] = pitch[i]*PI/180;
+//    String roundpitch = nf(pitch[i],0,3);
+//    pitch[i] = Float.valueOf(roundpitch).floatValue();
+    
+    
+    roll[i] = float(thisRow[2]);
+    roll[i] = roll[i]*PI/180;
+//    String round = nf(roll[i],0,3);
+//    roll[i] = Float.valueOf(round).floatValue();
     Coordinate c = new Coordinate();
-    println(yaw[i]);
-     c.quat = new Quaternion().createFromEuler(roll[i],yaw[i],pitch[i]  );
+    println("yaw: " + yaw[i]);
+    println("pitch: " + pitch[i]);
+    println("roll: " + roll[i]);
+    //println(round);
+    
+     c.quat = new Quaternion().createFromEuler(pitch[i],yaw[i],roll[i] );
+     c.loc.add(i,0,0);
+     
      
      allCoordinates.add(c);
     
