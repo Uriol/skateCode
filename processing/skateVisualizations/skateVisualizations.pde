@@ -1,3 +1,8 @@
+// to do:
+// draw when jumping and add quaternions
+import toxi.processing.*;
+import peasy.org.apache.commons.math.geometry.*;
+import toxi.geom.*;
 import peasy.*;
 PeasyCam cam;
 
@@ -35,6 +40,7 @@ float zPosition = 0;
 float[] zPositions;
 
 // Yaw
+float initialYawOnJumping;
 float[] yaw;
 float initialYaw;
 float angleDifference = 0;
@@ -133,13 +139,15 @@ void calculatePositions(){
        
     } else {
       if ( jumping == false ) {
-        println("start to jump");
+        
+        initialYawOnJumping = yaw[k];
+        println(initialYawOnJumping);
         
       }
       
       jumping = true;
       landing = false;
-
+      calculateJump();
    }
     
     if (jumping == false && landing == false){
@@ -174,13 +182,26 @@ void onGround(){
    // yPositions[k-100] = yPosition;
     //println(xPosition + ", " + yPosition);
     
+    // Calculate quaternions
+    
+    pitch[k] = pitch[k]*PI/180;
+    
+    
+    roll[k] = roll[k]*PI/180;
+    
+    
     // Add to coordinates class
     Coordinate c = new Coordinate();
     c.loc.add(xPosition, yPosition, 0);
-    c.YPR.add(totalAngleDifference*-1,0,0);
+    c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+    //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
 
+void calculateJump(){
+  println("jumping");
+  
+}
 
 void checkPreviousAccels(){
   println(zAccel[k-1]);
