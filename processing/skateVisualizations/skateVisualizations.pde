@@ -1,12 +1,22 @@
-// to do:
-// draw when jumping and add quaternions
+// 1 - can a background image be not affected by the 3d camera ?
+// 2 - change box colors when jumping
+// 3 - once the trick is drawed don't restart animation
+
+
+
 import toxi.processing.*;
 import peasy.org.apache.commons.math.geometry.*;
 import toxi.geom.*;
 import peasy.*;
-PeasyCam cam;
+import controlP5.*;
+//import processing.opengl.*;
 
-String csvFile = "jumpTest3.csv";
+PeasyCam cam;
+ControlP5 controlP5;
+PMatrix3D currCameraMatrix;
+PGraphics3D g3; 
+
+String csvFile = "flip180Test.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -40,7 +50,7 @@ float zPosition = 0;
 float[] zPositions;
 
 // Yaw
-float initialYawOnJumping;
+float initialYawOnJumping, yawOnLanding;
 float[] yaw;
 float initialYaw;
 float angleDifference = 0;
@@ -52,7 +62,7 @@ float[] roll;
 
 
 // booleans
-boolean jumping, landing, stillJumping;
+boolean jumping, landing, stillJumping, plus180, minus180;
 
 
 // loops
@@ -62,8 +72,13 @@ String[] rawData;
 
 void setup() {
   size(1400, 800, OPENGL);
+  
+  g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 100);
-  colorMode(HSB);
+  controlP5 = new ControlP5(this);
+  controlP5.addButton("button").setPosition(0,0).setImages(loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg")).updateSize();
+
+  controlP5.setAutoDraw(false);
 
   rawData = loadStrings(csvFile);
   parseTextFile(csvFile);
@@ -74,6 +89,7 @@ void setup() {
 
 void draw() {
   background(40);
+
   lights();
   // center axis
   fill(100);
@@ -89,7 +105,7 @@ void draw() {
   noFill();
   
   drawBoxes();
-
+  gui();
 }
 
 void parseTextFile(String _name){
@@ -127,16 +143,14 @@ void calculatePositions(){
   // Loop through the data after the 2 first seconds
   for (k = 200; k < rawData.length; k++) {
     
-    
+    // Detect when not jumping, when jumping and when landing
     if (zAccel[k] == 0 ) {
        if ( jumping == true ) {
-        jumping = false;
-        
-         checkPreviousAccels(); 
-      // landing = true; println("landing");  
-     }
-       
-       
+          jumping = false;
+          checkPreviousAccels(); 
+          // landing = true; println("landing");  
+         }
+
     } else {
       if ( jumping == false ) {
         
@@ -147,8 +161,15 @@ void calculatePositions(){
       
       jumping = true;
       landing = false;
-      calculateJump();
    }
+   
+    if (jumping == true ) {
+      calculateJump();
+    }
+    
+    if ( landing == true ) {
+      calculateLanding();
+    }
     
     if (jumping == false && landing == false){
       onGround();
@@ -160,6 +181,8 @@ void calculatePositions(){
 
 void onGround(){
   
+  if ( plus180 == true ) { yaw[k] = yaw[k] + 180;}
+  if ( minus180 == true ) { yaw[k] = yaw[k] - 180;}
   // Calculate yaw difference
     totalAngleDifference = yaw[k] - initialYaw;
     //println(totalAngleDifference);
@@ -200,14 +223,74 @@ void onGround(){
 
 void calculateJump(){
   println("jumping");
+//  println(xSpeed);
+  totalAngleDifference = yaw[k] - initialYaw;
+  totalAngleDifference = totalAngleDifference*PI/180;
+    
+  xPosition = xInitialPosition + xSpeed*time;
+  xInitialPosition = xPosition;
+  
+  yPosition = yInitialPosition + ySpeed*time;
+  yInitialPosition = yPosition;
+  
+  pitch[k] = pitch[k]*PI/180;
+  roll[k] = roll[k]*PI/180;
+  
+  // Add to coordinate class
+  Coordinate c = new Coordinate();
+  c.loc.add(xPosition, yPosition, 0);
+  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+  c.cJumping = jumping;
+  allCoordinates.add(c);
+  
+}
+
+void calculateLanding(){
+//  plus180 = false;
+//  minus180 = false;
+  landing = false;
+  yawOnLanding = yaw[k];
+  println(initialYawOnJumping);
+  println(yawOnLanding);
+  
+  // Calculate 180s
+  // first case initialYaw < 0 > 90
+  if ( initialYawOnJumping > 0 && initialYawOnJumping < 90 ) {
+    if ( -90 + initialYawOnJumping < yawOnLanding && 90 + initialYawOnJumping > yawOnLanding) { yawOnLanding = yawOnLanding; println("case 1: final yawOnLanding not 180");}
+    else if ( 90 + initialYawOnJumping < yawOnLanding && yawOnLanding < 179 ) { yawOnLanding = yawOnLanding - 180; println("case 1: final yawOnLanding -180"); minus180 = true; plus180 = false;}
+    else if ( -90 + initialYawOnJumping > yawOnLanding && yawOnLanding > -179 ) { yawOnLanding = yawOnLanding + 180; println("case 1: final yawOnLanding +180"); plus180 = true; minus180 = false;}
+  }
+  
+  // second case initialYaw > 90 < 179
+  if ( initialYawOnJumping > 90 && initialYawOnJumping < 179) {
+    if ( yawOnLanding > 0 && 90 - ( 179 - initialYawOnJumping ) > yawOnLanding ) { yawOnLanding = yawOnLanding - 180 ; println("case 2: final yawOnLanding -180"); minus180 = true; plus180 = false;}
+    else if ( -90 - (179 - initialYawOnJumping) < yawOnLanding && yawOnLanding < 0 ) { yawOnLanding = yawOnLanding + 180; println("case 2: final yawOnLanding + 180"); plus180 = true; minus180 = false;}
+    else { yawOnLanding = yawOnLanding; println("case 2: final yawOnLanding not 180");}
+  }
+  
+  // Third case initial yaw < 0 > -90
+  if ( initialYawOnJumping < 0 && initialYawOnJumping > -90 ) {
+    if ( yawOnLanding > -179 && yawOnLanding < -90 + initialYawOnJumping) { yawOnLanding = yawOnLanding + 180; println("case 3: final yawOnLanding + 180"); plus180 = true; minus180 = false; }
+    else if ( 90 + initialYawOnJumping < yawOnLanding && yawOnLanding < 179 ) { yawOnLanding = yawOnLanding - 180; println("case 3: final yawOnLanding - 180"); minus180 = true; plus180 = false;}
+    else { yawOnLanding = yawOnLanding; println("case 3: final yawOnLanding not 180");}
+  }
+  
+  // Fourth case initial yaw > -90 < -179
+  if ( initialYawOnJumping < -90 && initialYawOnJumping > -179 ) {
+    if ( yawOnLanding > 0 && 90 + ( 179 + initialYawOnJumping ) > yawOnLanding ) { yawOnLanding = yawOnLanding - 180; println("case 4: final yawOnLanding - 180"); minus180 = true; plus180 = false;}
+    else if ( -90 + (179 + initialYawOnJumping ) < yawOnLanding && yawOnLanding < 0 ) { yawOnLanding = yawOnLanding + 180; println("case 4: final yawOnLanding + 180"); plus180 = true; minus180 = false;}
+    else { yawOnLanding = yawOnLanding; println("case 4: final yawOnLanding not 180");}
+  }
+  
+  totalAngleDifference = yawOnLanding - initialYaw;
   
 }
 
 void checkPreviousAccels(){
-  println(zAccel[k-1]);
-  println(zAccel[k-2]);
-  println(zAccel[k-3]);
-  println(zAccel[k-4]);
+//  println(zAccel[k-1]);
+//  println(zAccel[k-2]);
+//  println(zAccel[k-3]);
+//  println(zAccel[k-4]);
   if ( zAccel[k-1] == 0 && zAccel[k-2] == 0 && zAccel[k-3] == 0 && zAccel[k-4] == 0) {
     landing = true;
     jumping = false;
@@ -222,16 +305,28 @@ void checkPreviousAccels(){
 
 
 void drawBoxes() {
-  boxCounter++;
-  
-  if ( boxCounter >= allCoordinates.size()) {
-    boxCounter = 0;
-  }
-  
-  for ( int i = 1; i < boxCounter; i++) {
-    Coordinate c = allCoordinates.get(i);
-    if ( jumping == false ) {
-      c.displayGround();
-    }
-  }  
+//  boxCounter++;
+//  
+//  if ( boxCounter >= allCoordinates.size()) {
+//    boxCounter = 0;
+//  }
+//  
+//  for ( int i = 1; i < boxCounter; i++) {
+//    Coordinate c = allCoordinates.get(i);
+//  
+//      c.displayGround(); 
+//  } 
+// delay(20); 
+
+for(Coordinate c : allCoordinates) {
+  c.displayGround(); 
+}
+}
+
+
+void gui() {
+   currCameraMatrix = new PMatrix3D(g3.camera);
+   camera();
+   controlP5.draw();
+   g3.camera = currCameraMatrix;
 }
