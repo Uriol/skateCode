@@ -20,11 +20,13 @@ String csvFile = "flip180Test.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
+//float time = 0.0004;
 float time = 0.02;
+float airtime = 0;
 float totalSpeed, previousTotalSpeed;
 int boxCounter;
 float pixelMultiplier = 2;
-
+float angleOfJump = 80*PI/180;
 
 // X edge
 float[] xAccel;
@@ -76,7 +78,7 @@ void setup() {
   g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 100);
   controlP5 = new ControlP5(this);
-  controlP5.addButton("button").setPosition(0,0).setImages(loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg")).updateSize();
+ // controlP5.addButton("button").setPosition(0,0).setImages(loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg")).updateSize();
 
   controlP5.setAutoDraw(false);
 
@@ -84,6 +86,7 @@ void setup() {
   parseTextFile(csvFile);
   calculateInitialSpeed();
   calculatePositions();
+  test();
   
 }
 
@@ -131,8 +134,11 @@ void calculateInitialSpeed(){
   // The first 2 seconds are not represented. 
   // Used to calculate the speed and the initial yaw. 
   for ( int j = 0; j < 200; j++) {
+    //time = time + 0.02;
     // println(xAccel[j]);
-    totalSpeed = previousTotalSpeed + (xAccel[j]*9.8)*time;
+    //totalSpeed = previousTotalSpeed + (xAccel[j]*9.8)*time*time;
+    //totalSpeed = previousTotalSpeed*time + (0.5*xAccel[j])*time*time;
+    totalSpeed = previousTotalSpeed + xAccel[j] * time ;
     previousTotalSpeed = totalSpeed;
     initialYaw = yaw[j];
   }
@@ -181,8 +187,8 @@ void calculatePositions(){
 
 void onGround(){
   
-  if ( plus180 == true ) { yaw[k] = yaw[k] + 180;}
-  if ( minus180 == true ) { yaw[k] = yaw[k] - 180;}
+  if ( plus180 == true ) { yaw[k] = yaw[k] + 180; pitch[k] = pitch[k]*-1; roll[k] = roll[k]*-1;}
+  if ( minus180 == true ) { yaw[k] = yaw[k] - 180; pitch[k] = pitch[k]*-1; roll[k] = roll[k]*-1;}
   // Calculate yaw difference
     totalAngleDifference = yaw[k] - initialYaw;
     //println(totalAngleDifference);
@@ -191,10 +197,12 @@ void onGround(){
     
     // Calculate speed for x 
     xSpeed = totalSpeed*cos(totalAngleDifference);
-    //println(xSpeed);
+    
     // Calculate xPosition in meters
+    //xPosition = xInitialPosition + xSpeed*time;
     xPosition = xInitialPosition + xSpeed*time;
     xInitialPosition = xPosition;
+//    println(xPosition);
    // xPositions[k-100] = xPosition;
 
     // Calculate speed for y
@@ -215,14 +223,24 @@ void onGround(){
     
     // Add to coordinates class
     Coordinate c = new Coordinate();
-    c.loc.add(xPosition, yPosition, 0);
+    c.loc.add(xPosition, yPosition, zPosition*-1);
     c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
 
 void calculateJump(){
-  println("jumping");
+  // calculate zSpeed
+  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.6;
+  println("zSpeed:" + zSpeed);
+  airtime = airtime + 0.02;
+  //println("airtime:" + airtime);
+ zPosition = zSpeed*airtime - 0.5*9.8*airtime*airtime ;
+//  zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
+//  zInitialPosition = zPosition;
+  println("zPosition: " + zPosition);
+  
+  //println("jumping");
 //  println(xSpeed);
   totalAngleDifference = yaw[k] - initialYaw;
   totalAngleDifference = totalAngleDifference*PI/180;
@@ -238,7 +256,7 @@ void calculateJump(){
   
   // Add to coordinate class
   Coordinate c = new Coordinate();
-  c.loc.add(xPosition, yPosition, 0);
+  c.loc.add(xPosition, yPosition, zPosition*-1);
   c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
   c.cJumping = jumping;
   allCoordinates.add(c);
@@ -250,8 +268,8 @@ void calculateLanding(){
 //  minus180 = false;
   landing = false;
   yawOnLanding = yaw[k];
-  println(initialYawOnJumping);
-  println(yawOnLanding);
+//  println(initialYawOnJumping);
+//  println(yawOnLanding);
   
   // Calculate 180s
   // first case initialYaw < 0 > 90
@@ -282,7 +300,28 @@ void calculateLanding(){
     else { yawOnLanding = yawOnLanding; println("case 4: final yawOnLanding not 180");}
   }
   
-  totalAngleDifference = yawOnLanding - initialYaw;
+  
+  
+//  if ( plus180 == true ) { yaw[k] = yaw[k] + 180;}
+//  if ( minus180 == true ) { yaw[k] = yaw[k] - 180;}
+//  
+//  totalAngleDifference = yawOnLanding - initialYaw;
+//  
+//  xPosition = xInitialPosition + xSpeed*time;
+//  xInitialPosition = xPosition;
+//  
+//  yPosition = yInitialPosition + ySpeed*time;
+//  yInitialPosition = yPosition;
+//  
+//  pitch[k] = pitch[k]*PI/180;
+//  roll[k] = roll[k]*PI/180;
+  
+   // Add to coordinate class
+//  Coordinate c = new Coordinate();
+//  c.loc.add(xPosition, yPosition, 0);
+//  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+//  c.cLanding = landing;
+//  allCoordinates.add(c);
   
 }
 
@@ -294,11 +333,11 @@ void checkPreviousAccels(){
   if ( zAccel[k-1] == 0 && zAccel[k-2] == 0 && zAccel[k-3] == 0 && zAccel[k-4] == 0) {
     landing = true;
     jumping = false;
-    println("landing");
+   // println("landing");
   } else {
     jumping = true;
     landing = false;
-    println("still jumping");
+    //println("still jumping");
   }
   
 } 
@@ -318,9 +357,9 @@ void drawBoxes() {
 //  } 
 // delay(20); 
 
-for(Coordinate c : allCoordinates) {
-  c.displayGround(); 
-}
+  for(Coordinate c : allCoordinates) {
+    c.displayGround(); 
+  }
 }
 
 
@@ -330,3 +369,53 @@ void gui() {
    controlP5.draw();
    g3.camera = currCameraMatrix;
 }
+
+
+void test(){ 
+//  zSpeed = 3.5;
+//  
+//  
+//  for ( int i = 0; i < 37; i++) {
+//    airtime = airtime+0.02;
+//    zPosition = zSpeed*airtime - 0.5*9.8*airtime*airtime;
+//    zInitialPosition = zPosition;
+//    println("zPosition: " + zPosition);
+//  }
+}
+
+
+
+
+// y = y0 + v0*t + 0,5*ax*t*t
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(pitch);
+
+
+
+
+//// time = 0.02
+//void calculateInitialSpeed(){
+// 
+//  for ( int j = 0; j < 200; j++) {
+//  
+//    totalSpeed = previousTotalSpeed + xAccel[j] * time ;
+//    previousTotalSpeed = totalSpeed;
+//    
+//  }
+//   
+//}
