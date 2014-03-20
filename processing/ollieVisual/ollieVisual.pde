@@ -11,7 +11,7 @@ ControlP5 controlP5;
 PMatrix3D currCameraMatrix;
 PGraphics3D g3; 
 
-String csvFile = "flip180Test.csv";
+String csvFile = "__ollie2.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -81,7 +81,7 @@ void setup() {
   parseTextFile(csvFile);
   calculateInitialSpeed();
   calculatePositions();
-  test();
+
   
 }
 
@@ -219,14 +219,14 @@ void onGround(){
     // Add to coordinates class
     Coordinate c = new Coordinate();
     c.loc.add(xPosition, yPosition, zPosition*-1);
-    c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
 
 void calculateJump(){
   // calculate zSpeed
-  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.65;
+  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.56;
   println("zSpeed:" + zSpeed);
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
@@ -252,7 +252,7 @@ void calculateJump(){
   // Add to coordinate class
   Coordinate c = new Coordinate();
   c.loc.add(xPosition, yPosition, zPosition*-1);
-  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
   c.cJumping = jumping;
   allCoordinates.add(c);
   
@@ -364,53 +364,3 @@ void gui() {
    controlP5.draw();
    g3.camera = currCameraMatrix;
 }
-
-
-void test(){ 
-//  zSpeed = 3.5;
-//  
-//  
-//  for ( int i = 0; i < 37; i++) {
-//    airtime = airtime+0.02;
-//    zPosition = zSpeed*airtime - 0.5*9.8*airtime*airtime;
-//    zInitialPosition = zPosition;
-//    println("zPosition: " + zPosition);
-//  }
-}
-
-
-
-
-// y = y0 + v0*t + 0,5*ax*t*t
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(pitch);
-
-
-
-
-//// time = 0.02
-//void calculateInitialSpeed(){
-// 
-//  for ( int j = 0; j < 200; j++) {
-//  
-//    totalSpeed = previousTotalSpeed + xAccel[j] * time ;
-//    previousTotalSpeed = totalSpeed;
-//    
-//  }
-//   
-//}

@@ -11,14 +11,15 @@ ControlP5 controlP5;
 PMatrix3D currCameraMatrix;
 PGraphics3D g3; 
 
-String csvFile = "flip180Test.csv";
+String csvFile = "__ollie2.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
 //float time = 0.0004;
 float time = 0.02;
 float airtime = 0;
-float totalSpeed, previousTotalSpeed;
+float totalSpeed = 2.5;
+float previousTotalSpeed;
 int boxCounter;
 float pixelMultiplier = 2;
 float angleOfJump = 80*PI/180;
@@ -79,14 +80,13 @@ void setup() {
 
   rawData = loadStrings(csvFile);
   parseTextFile(csvFile);
-  calculateInitialSpeed();
   calculatePositions();
-  test();
+
   
 }
 
 void draw() {
-  background(40);
+  background(60);
 
   lights();
   // center axis
@@ -122,27 +122,15 @@ void parseTextFile(String _name){
     pitch[i] = float(thisRow[3]);
     roll[i] = float(thisRow[4]);
     //println(roll[i]);
+    initialYaw = yaw[0];
   }
 }
 
-void calculateInitialSpeed(){
-  // The first 2 seconds are not represented. 
-  // Used to calculate the speed and the initial yaw. 
-  for ( int j = 0; j < 200; j++) {
-    //time = time + 0.02;
-    // println(xAccel[j]);
-    //totalSpeed = previousTotalSpeed + (xAccel[j]*9.8)*time*time;
-    //totalSpeed = previousTotalSpeed*time + (0.5*xAccel[j])*time*time;
-    totalSpeed = previousTotalSpeed + xAccel[j] * time ;
-    previousTotalSpeed = totalSpeed;
-    initialYaw = yaw[j];
-  }
-   println(totalSpeed); println(initialYaw);
-}
+
 
 void calculatePositions(){
   // Loop through the data after the 2 first seconds
-  for (k = 200; k < rawData.length; k++) {
+  for (k = 0; k < rawData.length; k++) {
     
     // Detect when not jumping, when jumping and when landing
     if (zAccel[k] == 0 ) {
@@ -182,8 +170,8 @@ void calculatePositions(){
 
 void onGround(){
   
-  if ( plus180 == true ) { yaw[k] = yaw[k] + 180; pitch[k] = pitch[k]*-1; roll[k] = roll[k]*-1;}
-  if ( minus180 == true ) { yaw[k] = yaw[k] - 180; pitch[k] = pitch[k]*-1; roll[k] = roll[k]*-1;}
+  if ( plus180 == true ) { yaw[k] = yaw[k] + 180; }
+  if ( minus180 == true ) { yaw[k] = yaw[k] - 180; }
   // Calculate yaw difference
     totalAngleDifference = yaw[k] - initialYaw;
     //println(totalAngleDifference);
@@ -219,14 +207,14 @@ void onGround(){
     // Add to coordinates class
     Coordinate c = new Coordinate();
     c.loc.add(xPosition, yPosition, zPosition*-1);
-    c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
 
 void calculateJump(){
   // calculate zSpeed
-  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.65;
+  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.56;
   println("zSpeed:" + zSpeed);
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
@@ -252,7 +240,7 @@ void calculateJump(){
   // Add to coordinate class
   Coordinate c = new Coordinate();
   c.loc.add(xPosition, yPosition, zPosition*-1);
-  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
   c.cJumping = jumping;
   allCoordinates.add(c);
   
@@ -364,53 +352,3 @@ void gui() {
    controlP5.draw();
    g3.camera = currCameraMatrix;
 }
-
-
-void test(){ 
-//  zSpeed = 3.5;
-//  
-//  
-//  for ( int i = 0; i < 37; i++) {
-//    airtime = airtime+0.02;
-//    zPosition = zSpeed*airtime - 0.5*9.8*airtime*airtime;
-//    zInitialPosition = zPosition;
-//    println("zPosition: " + zPosition);
-//  }
-}
-
-
-
-
-// y = y0 + v0*t + 0,5*ax*t*t
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(pitch);
-
-
-
-
-//// time = 0.02
-//void calculateInitialSpeed(){
-// 
-//  for ( int j = 0; j < 200; j++) {
-//  
-//    totalSpeed = previousTotalSpeed + xAccel[j] * time ;
-//    previousTotalSpeed = totalSpeed;
-//    
-//  }
-//   
-//}
