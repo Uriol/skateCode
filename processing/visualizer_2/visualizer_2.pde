@@ -11,6 +11,8 @@ ControlP5 controlP5;
 PMatrix3D currCameraMatrix;
 PGraphics3D g3; 
 
+
+float totalSpeed = 2.5;
 String csvFile = "__ollie2.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
@@ -18,7 +20,7 @@ ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 //float time = 0.0004;
 float time = 0.02;
 float airtime = 0;
-float totalSpeed = 2.5;
+
 float previousTotalSpeed;
 int boxCounter;
 float pixelMultiplier = 2;
@@ -69,12 +71,12 @@ int k;
 String[] rawData;
 
 void setup() {
-  size(1400, 800, OPENGL);
+  size(1344, 760, OPENGL);
   
   g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 100);
   controlP5 = new ControlP5(this);
- // controlP5.addButton("button").setPosition(0,0).setImages(loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg"),loadImage("Justice-newlands.jpg")).updateSize();
+  controlP5.addButton("button").setPosition(0,0).setImages(loadImage("background.jpg"),loadImage("background.jpg"),loadImage("background.jpg")).updateSize();
 
   controlP5.setAutoDraw(false);
 
