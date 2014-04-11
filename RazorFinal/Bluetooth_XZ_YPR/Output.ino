@@ -4,7 +4,7 @@ float S = 0.00390625;
 float _yaw,_pitch, _roll;
 float q[4];
 float  gx, gy, gz;
-float fz;
+float fx,fz;
 
 void output_angles()
 { 
@@ -16,10 +16,9 @@ void output_angles()
   rx = accel[0] * S;
   ry = accel[1] * S;
   rz = accel[2] * S;
-  
-  // If moving very slow ---> set to 0
-  if ( rx <= 0.1 && rx >= -0.1 ) { rx = 0;}
-  
+// Serial1.print(rz); Serial1.print(","); 
+  // Serial.print(rz); Serial.print(","); 
+   
   // Calculate Quaternion to remove gravity from z axis
   // Get quaternions data
   float c1 = cos(yaw/2);
@@ -37,19 +36,39 @@ void output_angles()
   gx = 2 * (q[0] * q[1] + q[2] * q[3]);
   gz = q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3];
   
+  // Substract gravity from X axis
+  fx = rx + gx;
+  // If moving very slow ---> set to 0
+  if ( fx <= 0.05 && fx >= -0.05 ) { fx = 0;}
   // Substract gravity from Z axis
   fz = rz - gz;
   // if fz is very small set it to 0
-  if (fz <= 0.35 && fz >= -0.35){
+  if (fz <= 0.99 && fz >= -0.99){
     fz = 0;
   }
+  
+//  Serial.print("gravity: ");
+//  Serial.println(gx);
+//  Serial.print("acceleration: ");
+//  Serial.println(rx);
+//  Serial.print("final accel: ");
+//  Serial.print(fx);
+  
+  
+   Serial.print(fx); Serial.print(",");
+  Serial.print(fz); Serial.print(",");
+  Serial.print(_yaw); Serial.print(",");
+  Serial.print(_pitch); Serial.print(",");
+  Serial.print(_roll); Serial.println("");
 
-  Serial1.print(rx); Serial1.print(",");
+  
+  
+  Serial1.print(fx); Serial1.print(",");
   Serial1.print(fz); Serial1.print(",");
   Serial1.print(_yaw); Serial1.print(",");
   Serial1.print(_pitch); Serial1.print(",");
   Serial1.print(_roll); Serial1.println("");
-  //Serial1.println();
+ 
    
 }
 

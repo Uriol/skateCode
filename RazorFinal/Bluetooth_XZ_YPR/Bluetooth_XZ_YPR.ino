@@ -3,6 +3,7 @@
 
 
 
+//#define OUTPUT__BAUD_RATE 115200
 #define OUTPUT__BAUD_RATE 115200
 
 #define OUTPUT__DATA_INTERVAL 20  // in milliseconds
@@ -62,12 +63,12 @@ boolean output_errors = false;  // true or false
 // Put MIN/MAX and OFFSET readings for your board here!
 // Accelerometer
 // "accel x,y,z (min/max) = X_MIN/X_MAX  Y_MIN/Y_MAX  Z_MIN/Z_MAX"
-#define ACCEL_X_MIN ((float) -250)
-#define ACCEL_X_MAX ((float) 261)
-#define ACCEL_Y_MIN ((float) -244)
-#define ACCEL_Y_MAX ((float) 273)
-#define ACCEL_Z_MIN ((float) -250)
-#define ACCEL_Z_MAX ((float) 258)
+#define ACCEL_X_MIN ((float) -256) // -255,  -256, - 265, -256
+#define ACCEL_X_MAX ((float) 258) //258, 297, 258,
+#define ACCEL_Y_MIN ((float) -239)// -246, -245, -242, -244, -239, -241, -252, -243, -239 
+#define ACCEL_Y_MAX ((float) 267) // 265, 268, 266,267  
+#define ACCEL_Z_MIN ((float) -257) //-257, 
+#define ACCEL_Z_MAX ((float) 263) // 264, 263
 
 // Magnetometer (standard calibration mode)
 // "magn x,y,z (min/max) = X_MIN/X_MAX  Y_MIN/Y_MAX  Z_MIN/Z_MAX"
@@ -81,14 +82,14 @@ boolean output_errors = false;  // true or false
 // Magnetometer (extended calibration mode)
 // Uncommend to use extended magnetometer calibration (compensates hard & soft iron errors)
 #define CALIBRATION__MAGN_USE_EXTENDED true
-const float magn_ellipsoid_center[3] = {30.6543, 69.4264, -56.3391};
-const float magn_ellipsoid_transform[3][3] = {{0.894517, 0.00383964, -0.0175036}, {0.00383964, 0.990752, -0.00160356}, {-0.0175036, -0.00160356, 0.996544}};
+const float magn_ellipsoid_center[3] = {138.776, 152.369, 46.3576};
+const float magn_ellipsoid_transform[3][3] = {{0.847402, 0.00594566, -0.0158968}, {0.00594566, 0.916946, 0.0102476}, {-0.0158968, 0.0102476, 0.997225}};
 
 // Gyroscope
 // "gyro x,y,z (current/average) = .../OFFSET_X  .../OFFSET_Y  .../OFFSET_Z
-#define GYRO_AVERAGE_OFFSET_X ((float) -2.82)
-#define GYRO_AVERAGE_OFFSET_Y ((float) 59.50)
-#define GYRO_AVERAGE_OFFSET_Z ((float) -5.89)
+#define GYRO_AVERAGE_OFFSET_X ((float) -27.97)
+#define GYRO_AVERAGE_OFFSET_Y ((float) -7.48)
+#define GYRO_AVERAGE_OFFSET_Z ((float) -4.78)
 
 
 // -----------------------------------------------------------------------------------------------------------------------------------

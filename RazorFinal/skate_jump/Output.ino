@@ -248,7 +248,7 @@ void in_the_air(){ // while jumping calculates : time in the air, pos X,Y. First
     z_accels[4] = cz;
   }
   
-  // If it is jumping calculate jump
+  // If it is jumping calculate jump 
   if ( jumping == true ) { Serial.println("Jumping ^^^^^^^^^^^^^^^^^^^^^^^^^ ");  calculateJump(); 
   
   Serial.print("speedX"); Serial.println(speedX);

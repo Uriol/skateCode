@@ -11,7 +11,7 @@ ControlP5 controlP5;
 PMatrix3D currCameraMatrix;
 PGraphics3D g3; 
 
-String csvFile = "flip180Test.csv";
+String csvFile = "__ollie2.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -219,7 +219,7 @@ void onGround(){
     // Add to coordinates class
     Coordinate c = new Coordinate();
     c.loc.add(xPosition, yPosition, zPosition*-1);
-    c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
@@ -252,7 +252,7 @@ void calculateJump(){
   // Add to coordinate class
   Coordinate c = new Coordinate();
   c.loc.add(xPosition, yPosition, zPosition*-1);
-  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
   c.cJumping = jumping;
   allCoordinates.add(c);
   

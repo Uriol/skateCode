@@ -13,7 +13,7 @@ PGraphics3D g3;
 
 
 float totalSpeed = 2.15;
-String csvFile = "5_flip3.csv";
+String csvFile = "5_ollie180.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -76,10 +76,10 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 100);
   
-  controlP5 = new ControlP5(this);
-  controlP5.addButton("button").setPosition(0,0).setImages(loadImage("background.jpg"),loadImage("background.jpg"),loadImage("background.jpg")).updateSize();
+  //controlP5 = new ControlP5(this);
+  //controlP5.addButton("button").setPosition(0,0).setImages(loadImage("background.jpg"),loadImage("background.jpg"),loadImage("background.jpg")).updateSize();
 
-  controlP5.setAutoDraw(false);
+  //controlP5.setAutoDraw(false);
 
   rawData = loadStrings(csvFile);
   parseTextFile(csvFile);
@@ -107,8 +107,8 @@ void draw() {
   stroke(255);
   noFill();
   
+ 
   drawBoxes();
-  drawLines();
   gui();
 }
 
@@ -176,8 +176,8 @@ void calculatePositions(){
 
 void onGround(){
   
-  if ( plus180 == true ) { yaw[k] = yaw[k] + 180; }
-  if ( minus180 == true ) { yaw[k] = yaw[k] - 180; }
+  if ( plus180 == true ) { yaw[k] = yaw[k] + 180; roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1;}
+  if ( minus180 == true ) { yaw[k] = yaw[k] - 180; roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1;}
   // Calculate yaw difference
     totalAngleDifference = yaw[k] - initialYaw;
     //println(totalAngleDifference);
@@ -220,14 +220,14 @@ void onGround(){
 
 void calculateJump(){
   // calculate zSpeed
-  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.80;
+  zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+0.50;
  // println("zSpeed:" + zSpeed);
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
  zPosition = zSpeed*airtime - 0.5*9.8*airtime*airtime ;
 //  zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
 //  zInitialPosition = zPosition;
- // println("zPosition: " + zPosition);
+  println("zPosition: " + zPosition);
   
   //println("jumping");
 //  println(xSpeed);
@@ -344,7 +344,7 @@ void drawBoxes() {
 //  
 //      c.displayGround(); 
 //  } 
-// delay(20); 
+// delay(15); 
 
   for(Coordinate c : allCoordinates) {
     
@@ -353,56 +353,7 @@ void drawBoxes() {
   }
 }
 
-void drawLines() {
- 
-  //for(int i =allCoordinates.size()-2; i>=0; i--) {
-  for (int i = 1; i < allCoordinates.size(); i++) {
-    Coordinate thisC = allCoordinates.get(i);
-    Coordinate prevC = allCoordinates.get(i-1);
-    
-    
-//    thisC.loc.x = thisC.loc.x+10;
-//    prevC.loc.x = prevC.loc.x+10;
-    
-    //println(prevC);
-    
-    
-    stroke(255,0,0);
-    strokeWeight(1);
-    pushMatrix();
-    float[] axis = prevC.quat.toAxisAngle();
-    translate(prevC.loc.x*50, prevC.loc.z*50, prevC.loc.y*50);
-    rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-    translate(-10,0,3.5);
-    
-    fill(255);
-    
-    //line(0,0,0);
-    box(1 );
-    float x = modelX(0, 0, 0);
-    float y = modelY(0, 0, 0);
-    float z = modelZ(0, 0, 0);
-//    println(i);
-//    println(x + ", " + y + ", " + z);
-    // rotateX(-PI/2); 
 
-     
-    //line(0,0,0,thisC.loc.x*50, thisC.loc.y*50, thisC.loc.z*50);
-   
-    popMatrix();
-    
-    pushMatrix();
-    float[] axisThis = thisC.quat.toAxisAngle();
-    translate(thisC.loc.x*50, thisC.loc.z*50, thisC.loc.y*50);
-    rotate(axisThis[0], axisThis[1], axisThis[3], axisThis[2]);
-    fill(0,255,0);
-     box(1 );
-    popMatrix();
-    
-  }
-//  noStroke();
-//    noFill();
-}
 
 
 void gui() {
