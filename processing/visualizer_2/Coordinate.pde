@@ -49,24 +49,6 @@ class Coordinate {
     noFill();
   }
   
-  
-//  void drawLine(PVector _p) {
-//    pushMatrix();
-//    translate(loc.x*50, loc.z*50, loc.y*50);
-//    float[] axis = quat.toAxisAngle();
-//    //rotateY(YPR.x);
-//    rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-//    stroke(255);
-//    if (cJumping) {
-//      fill(250, 100, 0, 100);
-//      stroke(250, 200, 0);
-//    }  
-//    else {
-//      fill(255, 100);
-//      stroke(250);
-//    }
-//    line(_p.x, _p.y, _p.z, 0,0,0);
-//    popMatrix();
-//  }
+
 }
 

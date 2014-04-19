@@ -7,6 +7,7 @@ class Coordinate {
   Quaternion quat;
   boolean cJumping;
   boolean cLanding;
+  boolean c180;
   
   Coordinate(){}
   
@@ -14,33 +15,36 @@ class Coordinate {
   
   void displayGround(){
     pushMatrix();
-      translate(loc.x*50,loc.z*50,loc.y*50);
+      translate(loc.x*70,loc.z*70, loc.y*70);
       float[] axis = quat.toAxisAngle();
-      //rotateY(YPR.x);
+     
+     // translate(-20,5,0);
+      
       rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-      stroke(255);
+      
+       rotateX(-PI/2);
+     //  translate(33.5, 0,0);
+      strokeWeight(1);
+       stroke(255);
       if(cJumping) {
+       // noFill();
         stroke(255,255,0);
-        fill(150, 150, 0, 100); 
+        fill(20);
+        //fill(150, 150, 0, 100); 
       } else if (cLanding) {
         fill(0); 
       } else {
-        fill(255, 100);
+        fill(255, 50);
       }
-      box(20,1,6 );
+      
+      //translate(20,0,0);
+     rectMode(CENTER);
+     //box(40, 0,10);
+     rect(0,0, 40,10);
+
+
     popMatrix();
   }
   
-//  void displayJump(){
-//    pushMatrix();
-//       translate(loc.x*100,0,loc.y*100);
-//      float[] axis = quat.toAxisAngle();
-//      //rotateY(YPR.x);
-//      rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-//      stroke(255);
-//      fill(100,0,0, 100);
-//      box(20,2,6 );
-//    popMatrix();
-//  }
   
 }

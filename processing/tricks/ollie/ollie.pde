@@ -333,24 +333,24 @@ void checkPreviousAccels(){
 
 
 void drawBoxes() {
-  boxCounter++;
-  
-  if ( boxCounter >= allCoordinates.size()) {
-    boxCounter = 0;
-  }
-  
-  for ( int i = 1; i < boxCounter; i++) {
-    Coordinate c = allCoordinates.get(i);
-  
-      c.displayGround(); 
-  } 
- delay(15); 
-//
-//  for(Coordinate c : allCoordinates) {
-//    
-//    c.displayGround();
-//     
+//  boxCounter++;
+//  
+//  if ( boxCounter >= allCoordinates.size()) {
+//    boxCounter = 0;
 //  }
+//  
+//  for ( int i = 1; i < boxCounter; i++) {
+//    Coordinate c = allCoordinates.get(i);
+//  
+//      c.displayGround(); 
+//  } 
+// delay(15); 
+//
+  for(Coordinate c : allCoordinates) {
+    
+    c.displayGround();
+     
+  }
 }
 
 

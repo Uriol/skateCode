@@ -13,7 +13,7 @@ PGraphics3D g3;
 
 
 float totalSpeed = 2.15;
-String csvFile = "5_flip3.csv";
+String csvFile = "5_ollie.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 

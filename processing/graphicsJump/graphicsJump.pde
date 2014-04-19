@@ -13,7 +13,7 @@ PGraphics3D g3;
 
 
 float totalSpeed = 2.15;
-String csvFile = "2jumps_one180.csv";
+String csvFile = "5_ollie180.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -68,10 +68,38 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 1.25;
+float firstJumpSpeed = 0.5;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
 float fourthJumpSpeed = -3.5;
+
+
+//// lines
+//// tail right
+//float[] tailRightPositionsX;
+//float[] tailRightPositionsZ;
+//float[] tailRightPositionsY;
+//
+//// nose Right
+//float[] noseRightPositionsX;
+//float[] noseRightPositionsZ;
+//float[] noseRightPositionsY;
+//
+//// tail left
+//float[] tailLeftPositionsX;
+//float[] tailLeftPositionsZ;
+//float[] tailLeftPositionsY;
+//
+//// nose left
+//float[] noseLeftPositionsX;
+//float[] noseLeftPositionsZ;
+//float[] noseLeftPositionsY;
+
+
+
+// skateboard shape lines
+// right side
+
 
 
 
@@ -86,39 +114,40 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 100);
   
-  //controlP5 = new ControlP5(this);
-  //controlP5.addButton("button").setPosition(0,0).setImages(loadImage("background.jpg"),loadImage("background.jpg"),loadImage("background.jpg")).updateSize();
-
-  //controlP5.setAutoDraw(false);
+  
 
   rawData = loadStrings(csvFile);
   parseTextFile(csvFile);
   calculatePositions();
-  
+  calculateLines();
  
 
 }
 
 void draw() {
   
-  background(60);
+  background(20);
 
-  //lights();
+  lights();
   // center axis
   fill(100);
-  box(5);
-  stroke(255, 255, 255);
+  //box(5);
+  stroke(255, 255, 255,20);
   line(0, 0, 0, 100, 0, 0);
-  stroke(80, 255, 255);
+  stroke(80, 255, 255,20);
   line(0, 0, 0, 0, 100, 0);
-  stroke(180, 255, 255);
+  stroke(180, 255, 255,20);
   line(0, 0, 0, 0, 0, 100);
 
-  stroke(255);
+  //stroke(255);
   noFill();
+ // blendMode(BLEND);
+  drawLines();
+ // blendMode(MULTIPLY);
+   drawBoxes();
   
- 
-  drawBoxes();
+  
+  
   gui();
 }
 
@@ -184,6 +213,8 @@ void calculatePositions(){
   
 }
 
+
+
 void onGround(){
   
   if ( plus180 == true ) { yaw[k] = yaw[k] + 180; roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1;}
@@ -224,6 +255,7 @@ void onGround(){
     Coordinate c = new Coordinate();
     c.loc.add(xPosition, yPosition, zPosition*-1);
     c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
+    if (plus180 == true || minus180 == true) { c.c180 = true;}
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
@@ -255,20 +287,7 @@ void calculateJump(){
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-//    zPosition = zSpeed*zInitialPosition - 0.5*9.8*airtime*airtime ;
-//    zInitialPosition = zPosition;
 
-//  if (startJump == false ) {
-//    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-//    startJump = true;
-//  }
-
-//  zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-//  zInitialPosition = zPosition;
-  //println("zPosition: " + zPosition);
-  
-  //println("jumping");
-//  println(xSpeed);
   totalAngleDifference = yaw[k] - initialYaw;
   totalAngleDifference = totalAngleDifference*PI/180;
     
@@ -291,24 +310,20 @@ void calculateJump(){
 }
 
 void calculateLanding(){
+  // restart
   airtime = 0;
   zInitialPosition = zPosition;
   println(zInitialPosition);
   println("calculateLanding");
-//  plus180 = false;
-//  minus180 = false;
+
     if (firstJump == true && firstJumpLanding == false) { firstJumpLanding = true;println("firstJump" + firstJump);};
     if (secondJump == true && secondJumpLanding == false) { secondJumpLanding = true; println("secondJump" + secondJump); };
     if (thirdJump == true && thirdJumpLanding == false ) { thirdJumpLanding = true; println("thirdJump" + thirdJump); };
     if (fourthJump == true && fourthJumpLanding == false ) { fourthJumpLanding = true; println("fourthJump" + fourthJump);};
-//  if (firstJump == true) { secondJump = true; println("secondJump" + secondJump);};
-//  if (secondJump == true && thirdJump == false) { thirdJump = true;println("thirdJump" + thirdJump);};
-//  if (thirdJump == true && fourthJump == false) { fourthJump = true;println("fourthJump" + fourthJump);};
+
   landing = false;
   yawOnLanding = yaw[k];
-//  println(initialYawOnJumping);
-//  println(yawOnLanding);
-  
+
   // Calculate 180s
   // first case initialYaw < 0 > 90
   if ( initialYawOnJumping > 0 && initialYawOnJumping < 90 ) {
@@ -340,34 +355,10 @@ void calculateLanding(){
   
   
   
-//  if ( plus180 == true ) { yaw[k] = yaw[k] + 180;}
-//  if ( minus180 == true ) { yaw[k] = yaw[k] - 180;}
-//  
-//  totalAngleDifference = yawOnLanding - initialYaw;
-//  
-//  xPosition = xInitialPosition + xSpeed*time;
-//  xInitialPosition = xPosition;
-//  
-//  yPosition = yInitialPosition + ySpeed*time;
-//  yInitialPosition = yPosition;
-//  
-//  pitch[k] = pitch[k]*PI/180;
-//  roll[k] = roll[k]*PI/180;
-  
-   // Add to coordinate class
-//  Coordinate c = new Coordinate();
-//  c.loc.add(xPosition, yPosition, 0);
-//  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
-//  c.cLanding = landing;
-//  allCoordinates.add(c);
-  
 }
 
 void checkPreviousAccels(){
-//  println(zAccel[k-1]);
-//  println(zAccel[k-2]);
-//  println(zAccel[k-3]);
-//  println(zAccel[k-4]);
+
   if ( zAccel[k-1] == 0 && zAccel[k-2] == 0 && zAccel[k-3] == 0 && zAccel[k-4] == 0) {
     landing = true;
     jumping = false;
@@ -375,10 +366,205 @@ void checkPreviousAccels(){
   } else {
     jumping = true;
     landing = false;
-    //println("still jumping");
   }
   
 } 
+
+
+
+void calculateLines(){
+  
+  tailRightPositionsX = new float[rawData.length];
+  tailRightPositionsZ = new float[rawData.length];
+  tailRightPositionsY = new float[rawData.length];
+  
+  noseRightPositionsX = new float[rawData.length];
+  noseRightPositionsZ = new float[rawData.length];
+  noseRightPositionsY = new float[rawData.length];
+  
+  tailLeftPositionsX = new float[rawData.length];
+  tailLeftPositionsZ = new float[rawData.length];
+  tailLeftPositionsY = new float[rawData.length];
+  
+  noseLeftPositionsX = new float[rawData.length];
+  noseLeftPositionsZ = new float[rawData.length];
+  noseLeftPositionsY = new float[rawData.length];
+  
+  
+  for (int i = 0; i < allCoordinates.size(); i++) {
+    Coordinate thisC = allCoordinates.get(i);
+    
+    // tail right
+    pushMatrix();
+      float[] axis = thisC.quat.toAxisAngle();
+      translate(thisC.loc.x*50, thisC.loc.z*50, thisC.loc.y*50);
+      rotate(axis[0], -axis[1], -axis[3], -axis[2]);
+      
+      if (thisC.c180 == false ) {
+        translate(-10,0,3);
+      } else if (thisC.c180 == true ) {
+        // nose left
+        translate(10,0,-3);
+      }
+      
+      float x = modelX(0, 0, 0);
+      float y = modelY(0, 0, 0);
+      float z = modelZ(0, 0, 0);
+      //println(x + ", " + y + ", " + z);
+      tailRightPositionsX[i] = x;
+      tailRightPositionsZ[i] = y;
+      tailRightPositionsY[i] = z;
+      
+        
+    popMatrix();
+    
+    // nose right
+    pushMatrix();
+      float[] axis2 = thisC.quat.toAxisAngle();
+      translate(thisC.loc.x*50, thisC.loc.z*50, thisC.loc.y*50);
+      rotate(axis2[0], -axis2[1], -axis2[3], -axis2[2]);
+      
+      
+      if (thisC.c180 == false ) {
+        translate(10,0,3);
+      } else if (thisC.c180 == true ) {
+        // tail left
+        translate(-10,0,-3);
+      }
+      
+      float x2 = modelX(0, 0, 0);
+      float y2 = modelY(0, 0, 0);
+      float z2 = modelZ(0, 0, 0);
+      //println(x + ", " + y + ", " + z);
+      noseRightPositionsX[i] = x2;
+      noseRightPositionsZ[i] = y2;
+      noseRightPositionsY[i] = z2;
+      
+        
+    popMatrix();
+    
+    // tail left
+    pushMatrix();
+      float[] axis3 = thisC.quat.toAxisAngle();
+      translate(thisC.loc.x*50, thisC.loc.z*50, thisC.loc.y*50);
+      rotate(axis3[0], -axis3[1], -axis3[3], -axis3[2]);
+      
+      if (thisC.c180 == false ) {
+        translate(-10,0, -3);
+      } else if (thisC.c180 == true ) {
+        // tail left
+        translate(10,0,3);
+      }
+      
+      float x3 = modelX(0, 0, 0);
+      float y3 = modelY(0, 0, 0);
+      float z3 = modelZ(0, 0, 0);
+      //println(x + ", " + y + ", " + z);
+      tailLeftPositionsX[i] = x3;
+      tailLeftPositionsZ[i] = y3;
+      tailLeftPositionsY[i] = z3;
+      
+        
+    popMatrix();
+    
+    // nose left
+    pushMatrix();
+      float[] axis4 = thisC.quat.toAxisAngle();
+      translate(thisC.loc.x*50, thisC.loc.z*50, thisC.loc.y*50);
+      rotate(axis4[0], -axis4[1], -axis4[3], -axis4[2]);
+      
+      if (thisC.c180 == false ) {
+        translate(10,0, -3);
+      } else if (thisC.c180 == true ) {
+        // tail left
+        translate(-10,0,3);
+      }
+      
+      float x4 = modelX(0, 0, 0);
+      float y4 = modelY(0, 0, 0);
+      float z4 = modelZ(0, 0, 0);
+      //println(x + ", " + y + ", " + z);
+      noseLeftPositionsX[i] = x4;
+      noseLeftPositionsZ[i] = y4;
+      noseLeftPositionsY[i] = z4;
+      
+        
+    popMatrix();
+  }
+}
+
+void drawLines(){
+  
+  for( int i = 1; i < tailRightPositionsX.length; i++){
+    
+    // tail right
+    float thisTRx = tailRightPositionsX[i];
+    float prevTRx = tailRightPositionsX[i-1];
+    
+    float thisTRz = tailRightPositionsZ[i];
+    float prevTRz = tailRightPositionsZ[i-1];
+    
+    float thisTRy = tailRightPositionsY[i];
+    float prevTRy = tailRightPositionsY[i-1];
+    
+    stroke(255,59,10);
+    line(prevTRx, prevTRz, prevTRy, thisTRx, thisTRz, thisTRy);
+    
+    // nose right
+    float thisNRx = noseRightPositionsX[i];
+    float prevNRx = noseRightPositionsX[i-1];
+    
+    float thisNRz = noseRightPositionsZ[i];
+    float prevNRz = noseRightPositionsZ[i-1];
+    
+    float thisNRy = noseRightPositionsY[i];
+    float prevNRy = noseRightPositionsY[i-1];
+    
+    line(prevNRx, prevNRz, prevNRy, thisNRx, thisNRz, thisNRy);
+    
+    // tail left
+    stroke(54,197, 241);
+    float thisTLx = tailLeftPositionsX[i];
+    float prevTLx = tailLeftPositionsX[i-1];
+    
+    float thisTLz = tailLeftPositionsZ[i];
+    float prevTLz = tailLeftPositionsZ[i-1];
+    
+    float thisTLy = tailLeftPositionsY[i];
+    float prevTLy = tailLeftPositionsY[i-1];
+    line(prevTLx, prevTLz, prevTLy, thisTLx, thisTLz, thisTLy);
+    
+    
+    // nose left
+    float thisNLx = noseLeftPositionsX[i];
+    float prevNLx = noseLeftPositionsX[i-1];
+    
+    float thisNLz = noseLeftPositionsZ[i];
+    float prevNLz = noseLeftPositionsZ[i-1];
+    
+    float thisNLy = noseLeftPositionsY[i];
+    float prevNLy = noseLeftPositionsY[i-1];
+    line(prevNLx, prevNLz, prevNLy, thisNLx, thisNLz, thisNLy);
+    
+    // ading more lines to the left
+    float stroke = random(0.25,1);
+//strokeWeight(stroke);
+//    line(prevTLx, prevTLz, prevTLy+0.5, thisTLx, thisTLz, thisTLy+0.5);
+//    line(prevTLx, prevTLz, prevTLy+1, thisTLx, thisTLz, thisTLy+1);
+//    line(prevTLx, prevTLz, prevTLy+1.5, thisTLx, thisTLz, thisTLy+1.5);
+//    line(prevTLx, prevTLz, prevTLy+2, thisTLx, thisTLz, thisTLy+2);
+//    line(prevTLx, prevTLz, prevTLy+2.5, thisTLx, thisTLz, thisTLy+2.5);
+//    
+  }
+}
+
+
+
+
+
+
+
+
 
 
 void drawBoxes() {
@@ -394,7 +580,7 @@ void drawBoxes() {
 //      c.displayGround(); 
 //  } 
 // delay(15); 
-//
+
   for(Coordinate c : allCoordinates) {
     
     c.displayGround();
@@ -406,8 +592,5 @@ void drawBoxes() {
 
 
 void gui() {
-//   currCameraMatrix = new PMatrix3D(g3.camera);
-//   camera();
-//   controlP5.draw();
-//   g3.camera = currCameraMatrix;
+
 }
