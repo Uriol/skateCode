@@ -1,7 +1,7 @@
 // john@frame.io
 // 518.588.1590
 
-
+// 1344 / 760
 
 import toxi.processing.*;
 import peasy.org.apache.commons.math.geometry.*;
@@ -14,8 +14,8 @@ PeasyCam cam;
 PImage img;
 
 
-float totalSpeed = 2.15;
-String csvFile = "5_ollie180.csv";
+float totalSpeed = 2;
+String csvFile = "7_noseManual.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -71,9 +71,9 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.8; // for ollie180
+float firstJumpSpeed = 0.9; // for ollie180
 //float firstJumpSpeed = 1;
-float secondJumpSpeed = -3; 
+float secondJumpSpeed = -1.5; 
 float thirdJumpSpeed = 1;
 float fourthJumpSpeed = -3.5;
 
@@ -194,7 +194,7 @@ void setup() {
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
-  img = loadImage("test.jpg");
+  img = loadImage("background4.jpg");
   
   
 
@@ -210,23 +210,17 @@ void setup() {
 
 void draw() {
   
-  background(60);
+  background(240);
   smooth();
  
    noLights();
-  //gui();
+  gui();
  
-  
-
-
-
 
 directionalLight(150, 150, 150, 0,0,90); // from top
 directionalLight(150, 150, 150, 0,0,-90); // from top
 directionalLight(150, 150, 150, 0,90,0); // from top
 directionalLight(150, 150, 150, 0,-90,0); // from bottom
-
-
 
 
   // center axis
@@ -371,7 +365,7 @@ void onGround(){
     }
     
    // c.cAcceleratingColor = acceleratingColor;
-    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
     if (plus180 == true || minus180 == true) { c.c180 = true;}
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
@@ -433,7 +427,7 @@ void calculateJump(){
   }
   c.cAcceleratingColor = acceleratingColor;
   prev_zPosition = zPosition;
-  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]);
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1);
   c.cJumping = jumping;
   allCoordinates.add(c);
   

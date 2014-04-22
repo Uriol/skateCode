@@ -1,8 +1,10 @@
 // john@frame.io
 // 518.588.1590
 
+//skateboard@mail.com
+// niko
 
-
+import processing.opengl.*;
 import toxi.processing.*;
 import peasy.org.apache.commons.math.geometry.*;
 import toxi.geom.*;
@@ -12,10 +14,10 @@ import controlP5.*;
 
 PeasyCam cam;
 PImage img;
-
+PImage texture; 
 
 float totalSpeed = 2.15;
-String csvFile = "5_ollie180.csv";
+String csvFile = "8_ollieStairs.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -71,7 +73,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.8; // for ollie180
+float firstJumpSpeed = 0.75; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -194,9 +196,9 @@ void setup() {
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
-  img = loadImage("test.jpg");
-  
-  
+  img = loadImage("background.jpg");
+  texture = loadImage("grip.jpg");
+  textureMode(NORMAL);
 
   
 
@@ -210,7 +212,7 @@ void setup() {
 
 void draw() {
   
-  background(60);
+  background(25);
   smooth();
  
    noLights();
@@ -221,10 +223,10 @@ void draw() {
 
 
 
-directionalLight(150, 150, 150, 0,0,90); // from top
-directionalLight(150, 150, 150, 0,0,-90); // from top
-directionalLight(150, 150, 150, 0,90,0); // from top
-directionalLight(150, 150, 150, 0,-90,0); // from bottom
+//directionalLight(150, 150, 150, 0,0,90); // from top
+//directionalLight(150, 150, 150, 0,0,-90); // from top
+//directionalLight(150, 150, 150, 0,90,0); // from top
+//directionalLight(150, 150, 150, 0,-90,0); // from bottom
 
 
 
@@ -371,7 +373,7 @@ void onGround(){
     }
     
    // c.cAcceleratingColor = acceleratingColor;
-    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
     if (plus180 == true || minus180 == true) { c.c180 = true;}
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
@@ -433,7 +435,7 @@ void calculateJump(){
   }
   c.cAcceleratingColor = acceleratingColor;
   prev_zPosition = zPosition;
-  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]);
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1);
   c.cJumping = jumping;
   allCoordinates.add(c);
   
@@ -1365,8 +1367,8 @@ void drawBoxes() {
     boxCounter = 0;
   }
   
-//  for ( int i = 1; i < boxCounter; i++) {
-//  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
+ // for ( int i = 1; i < boxCounter; i++) {
+//  for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
 //    Coordinate c = allCoordinates.get(i);
 //    
 //    //drawSkateboards();

@@ -1,6 +1,8 @@
 // john@frame.io
 // 518.588.1590
 
+//skateboard@mail.com
+// niko
 
 
 import toxi.processing.*;
@@ -14,8 +16,8 @@ PeasyCam cam;
 PImage img;
 
 
-float totalSpeed = 2.15;
-String csvFile = "5_ollie180.csv";
+float totalSpeed = 2.4;
+String csvFile = "8_noseGrind_FINAL.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -65,19 +67,19 @@ float[] roll;
 
 
 // booleans
-boolean jumping, landing, stillJumping, plus180, minus180;
+boolean jumping, landing, stillJumping, plus180, minus180, grinding, ground;
 
 // jump booleans
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.8; // for ollie180
+float firstJumpSpeed = 0.5; // for ollie180
 //float firstJumpSpeed = 1;
-float secondJumpSpeed = -3; 
+float secondJumpSpeed = -2.6; 
 float thirdJumpSpeed = 1;
 float fourthJumpSpeed = -3.5;
 
-
+boolean manual;
 
 
 
@@ -191,10 +193,10 @@ String[] rawData;
 
 void setup() {
   size(1344, 760, OPENGL);
-  //frameRate(200);
+  frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
-  img = loadImage("test.jpg");
+  img = loadImage("background.jpg");
   
   
 
@@ -210,7 +212,7 @@ void setup() {
 
 void draw() {
   
-  background(60);
+  background(25);
   smooth();
  
    noLights();
@@ -221,10 +223,10 @@ void draw() {
 
 
 
-directionalLight(150, 150, 150, 0,0,90); // from top
-directionalLight(150, 150, 150, 0,0,-90); // from top
-directionalLight(150, 150, 150, 0,90,0); // from top
-directionalLight(150, 150, 150, 0,-90,0); // from bottom
+//directionalLight(150, 150, 150, 0,0,90); // from top
+//directionalLight(150, 150, 150, 0,0,-90); // from top
+//directionalLight(150, 150, 150, 0,90,0); // from top
+//directionalLight(150, 150, 150, 0,-90,0); // from bottom
 
 
 
@@ -299,6 +301,7 @@ void calculatePositions(){
       
       jumping = true;
       landing = false;
+      grinding = false;
    }
    
     if (jumping == true ) {
@@ -309,9 +312,11 @@ void calculatePositions(){
       calculateLanding();
     }
     
-    if (jumping == false && landing == false){
+    if (jumping == false && landing == false && grinding == false){
       onGround();
     }
+    
+    if (grinding == true){ onGrind();}
     
   }
   
@@ -320,8 +325,8 @@ void calculatePositions(){
 
 
 void onGround(){
-  
-  
+  println("ground");
+  ground = true;
   
   if ( plus180 == true ) { yaw[k] = yaw[k] + 180; roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1;}
   if ( minus180 == true ) { yaw[k] = yaw[k] - 180;roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1; }
@@ -370,23 +375,29 @@ void onGround(){
      // acceleratingColor = acceleratingColor + 5;
     }
     
+    // if manual == true paint board yellow
+    if (manual == true){ c.cManual = true;};
+    
    // c.cAcceleratingColor = acceleratingColor;
-    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k] );
+    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
     if (plus180 == true || minus180 == true) { c.c180 = true;}
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
 }
 
 void calculateJump(){
-  
+  ground = true;
   // calculate zSpeed
   if (firstJump == false){
     firstJump = true;
     zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+firstJumpSpeed;
+    
+//    cManual = true;
   }
   
   if ( firstJumpLanding == true && secondJump == false ) {
     secondJump = true;
+    
     zSpeed = sqrt(xSpeed*xSpeed + ySpeed*ySpeed)*sin(angleOfJump)+secondJumpSpeed;
   }
   
@@ -433,10 +444,37 @@ void calculateJump(){
   }
   c.cAcceleratingColor = acceleratingColor;
   prev_zPosition = zPosition;
-  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]);
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1);
   c.cJumping = jumping;
   allCoordinates.add(c);
   
+}
+
+// calculate grind
+void onGrind(){
+  ground = false;
+  grinding = true;
+  println("grinding");
+  
+  // calculate speeds
+   totalAngleDifference = yaw[k] - initialYaw;
+  totalAngleDifference = totalAngleDifference*PI/180;
+    
+  xPosition = xInitialPosition + xSpeed*time;
+  xInitialPosition = xPosition;
+  
+  yPosition = yInitialPosition + ySpeed*time;
+  yInitialPosition = yPosition;
+  
+  pitch[k] = pitch[k]*PI/180;
+  roll[k] = roll[k]*PI/180;
+  
+  // Add to coordinate class
+  Coordinate c = new Coordinate();
+  c.loc.add(xPosition, yPosition, zPosition*-1);
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
+  c.cGrinding = true;
+  allCoordinates.add(c);
 }
 
 void calculateLanding(){
@@ -446,8 +484,8 @@ void calculateLanding(){
   println(zInitialPosition);
   println("calculateLanding");
 
-    if (firstJump == true && firstJumpLanding == false) { firstJumpLanding = true;println("firstJump" + firstJump);};
-    if (secondJump == true && secondJumpLanding == false) { secondJumpLanding = true; println("secondJump" + secondJump); };
+    if (firstJump == true && firstJumpLanding == false) { firstJumpLanding = true;println("firstJump" + firstJump); manual = true; println("manual: " + manual);grinding = true;};
+    if (secondJump == true && secondJumpLanding == false) { secondJumpLanding = true; println("secondJump" + secondJump); manual = false; println("manual: " + manual); grinding = false;};
     if (thirdJump == true && thirdJumpLanding == false ) { thirdJumpLanding = true; println("thirdJump" + thirdJump); };
     if (fourthJump == true && fourthJumpLanding == false ) { fourthJumpLanding = true; println("fourthJump" + fourthJump);};
 

@@ -15,7 +15,7 @@ PImage img;
 
 
 float totalSpeed = 2.15;
-String csvFile = "5_ollie180.csv";
+String csvFile = "7_lateShoveit.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -71,7 +71,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.8; // for ollie180
+float firstJumpSpeed = 0.6; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -194,7 +194,7 @@ void setup() {
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
-  img = loadImage("test.jpg");
+  img = loadImage("background.jpg");
   
   
 
@@ -210,7 +210,7 @@ void setup() {
 
 void draw() {
   
-  background(60);
+  background(240);
   smooth();
  
    noLights();
