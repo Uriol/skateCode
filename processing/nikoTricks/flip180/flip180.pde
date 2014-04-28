@@ -14,6 +14,7 @@ import controlP5.*;
 
 PeasyCam cam;
 PImage img;
+PImage name;
 
 
 float totalSpeed = 2.15;
@@ -197,6 +198,7 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
   img = loadImage("background.jpg");
+  name = loadImage("heelflipWhite.png");
   
   
 
@@ -254,6 +256,11 @@ void draw() {
   //blendMode(BLEND);
 //  topTail.setFill(#95CFB7);
 //  shape(topTail);
+
+// TRICK NAME
+cam.beginHUD();
+image(name, 40, height-75);
+cam.endHUD();
   
 }
 

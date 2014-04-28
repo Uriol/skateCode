@@ -14,6 +14,7 @@ import controlP5.*;
 
 PeasyCam cam;
 PImage img;
+PImage name;
 
 
 float totalSpeed = 2.15;
@@ -197,7 +198,7 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
   img = loadImage("background.jpg");
-  
+  name = loadImage("ollie180.png");
   
 
   
@@ -250,10 +251,11 @@ void draw() {
   drawBoxes();
    //drawSkateboards();
  // noFill();
- 
-  //blendMode(BLEND);
-//  topTail.setFill(#95CFB7);
-//  shape(topTail);
+
+// TRICK NAME
+cam.beginHUD();
+image(name, 40, height-75);
+cam.endHUD();
   
 }
 
@@ -1367,20 +1369,20 @@ void drawBoxes() {
     boxCounter = 0;
   }
   
-//  for ( int i = 1; i < boxCounter; i++) {
-//  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
-//    Coordinate c = allCoordinates.get(i);
-//    
-//    //drawSkateboards();
-//      c.displayGround(); 
-//  } 
+  for ( int i = 1; i < boxCounter; i++) {
+  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
+    Coordinate c = allCoordinates.get(i);
+    
+    //drawSkateboards();
+      c.displayGround(); 
+  } 
 // delay(15); 
 
-  for(Coordinate c : allCoordinates) {
-    
-    c.displayGround();
-     
-  }
+//  for(Coordinate c : allCoordinates) {
+//    
+//    c.displayGround();
+//     
+//  }
 }
 
 

@@ -10,13 +10,17 @@ import peasy.org.apache.commons.math.geometry.*;
 import toxi.geom.*;
 import peasy.*;
 import controlP5.*;
+import processing.video.*;
 //import processing.opengl.*;
 
 PeasyCam cam;
 PImage img;
+PImage name;
+Movie video;
 
 
-float totalSpeed = 2.15;
+
+float totalSpeed = 2.5;
 String csvFile = "8_ollieStairs.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
@@ -24,6 +28,7 @@ ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 //float time = 0.0004;
 float time = 0.02;
 float airtime = 0;
+float previousPitch;
 
 float previousTotalSpeed;
 int boxCounter;
@@ -73,7 +78,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.5; // for ollie180
+float firstJumpSpeed = -0.5; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -197,21 +202,24 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
   img = loadImage("background.jpg");
+  name = loadImage("ollie.png");
   
-  
-
+  video = new Movie(this, "ollieStairs.mov");
+  //video.loop();
   
 
   rawData = loadStrings(csvFile);
   parseTextFile(csvFile);
   calculatePositions();
- calculateSkateBoards();
+// calculateSkateBoards();
  
 
 }
 
 void draw() {
-  
+
+
+
   background(25);
   smooth();
  
@@ -248,13 +256,26 @@ void draw() {
   //blendMode(MULTIPLY);
 //  drawSkateboards();
   drawBoxes();
-   //drawSkateboards();
- // noFill();
- 
-  //blendMode(BLEND);
-//  topTail.setFill(#95CFB7);
-//  shape(topTail);
-  
+
+ // TRICK NAME
+cam.beginHUD();
+image(name, 40, height-75);
+cam.endHUD();
+
+//cam.beginHUD();
+//image(video, 0,0);
+//cam.endHUD();
+
+pushMatrix();
+
+  translate(1965.8483 ,10,730.9115);
+ // translate(500,0,0);
+  rotateY(0.698);
+  fill(25);
+  stroke(100);
+  drawPark();
+  popMatrix();
+
 }
 
 void parseTextFile(String _name){
@@ -277,7 +298,9 @@ void parseTextFile(String _name){
   }
 }
 
-
+void movieEvent(Movie video) {
+  video.read();
+}
 
 void calculatePositions(){
   // Loop through the data after the 2 first seconds
@@ -406,7 +429,7 @@ void calculateJump(){
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-
+//println("zPosition:" + zPosition);
   totalAngleDifference = yaw[k] - initialYaw;
   totalAngleDifference = totalAngleDifference*PI/180;
     
@@ -420,8 +443,6 @@ void calculateJump(){
   roll[k] = roll[k]*PI/180;
   
   
-  
-  
   // Add to coordinate class
   Coordinate c = new Coordinate();
   c.loc.add(xPosition, yPosition, zPosition*-1);
@@ -433,11 +454,27 @@ void calculateJump(){
     acceleratingColor = acceleratingColor -7;
     
   }
+  
+  if ( pitch[k] <= previousPitch ) { 
+    //println("nose up"); 
+    c.noseDown = false;
+  } else { 
+   // println("nose down");
+    c.noseDown = true;
+  };
+  
+  
   c.cAcceleratingColor = acceleratingColor;
   prev_zPosition = zPosition;
   c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1);
   c.cJumping = jumping;
   allCoordinates.add(c);
+  
+  
+  
+  
+  
+  previousPitch = pitch[k];
   
 }
 
@@ -504,651 +541,7 @@ void checkPreviousAccels(){
 
 
 
-void calculateSkateBoards(){
-  
-  backRightX = new float[rawData.length];
-  backRightZ = new float[rawData.length];
-  backRightY = new float[rawData.length];
-  
-  
-  
-  backRightBezierX = new float[rawData.length];
-  backRightBezierZ = new float[rawData.length];
-  backRightBezierY = new float[rawData.length];
-  
-  tailRightX = new float[rawData.length];
-  tailRightZ = new float[rawData.length];
-  tailRightY = new float[rawData.length];
-  
-  tailRightCenterX = new float[rawData.length];
-  tailRightCenterZ = new float[rawData.length];
-  tailRightCenterY = new float[rawData.length];
-  
-  tailRightBezierCenterX = new float[rawData.length];
-  tailRightBezierCenterZ = new float[rawData.length];
-  tailRightBezierCenterY = new float[rawData.length];
-  
-  tailRightBezierX = new float[rawData.length];
-  tailRightBezierZ = new float[rawData.length];
-  tailRightBezierY = new float[rawData.length];
-  
-  // nose -----------------------------------------------------------
-  
-  noseRightCenterX = new float[rawData.length];
-  noseRightCenterZ = new float[rawData.length];
-  noseRightCenterY = new float[rawData.length];
-  
-  noseRightBezierCenterX = new float[rawData.length];
-  noseRightBezierCenterZ = new float[rawData.length];
-  noseRightBezierCenterY = new float[rawData.length];
-  
-   noseRightX = new float[rawData.length];
-  noseRightZ = new float[rawData.length];
-  noseRightY = new float[rawData.length];
-  
-  noseRightBezierX = new float[rawData.length];
-   noseRightBezierZ = new float[rawData.length];
-    noseRightBezierY = new float[rawData.length];
-  
-  
-  frontRightX = new float[rawData.length];
-  frontRightZ = new float[rawData.length];
-  frontRightY = new float[rawData.length];
-  
-  frontRightBezierX = new float[rawData.length];
-  frontRightBezierZ = new float[rawData.length];
-  frontRightBezierY = new float[rawData.length];
-  
-  
-  // left side ----------------------------------------------------------------------------------------------------
-  
-  backLeftX = new float[rawData.length];
-  backLeftZ = new float[rawData.length];
-  backLeftY = new float[rawData.length];
-  
-  backLeftBezierX = new float[rawData.length];
-  backLeftBezierZ = new float[rawData.length];
-  backLeftBezierY = new float[rawData.length];
-  
-  tailLeftX = new float[rawData.length];
-  tailLeftZ = new float[rawData.length];
-  tailLeftY = new float[rawData.length];
-  
-  tailLeftBezierX = new float[rawData.length];
-  tailLeftBezierZ = new float[rawData.length];
-  tailLeftBezierY = new float[rawData.length];
-  
-   noseLeftX = new float[rawData.length];
-  noseLeftZ = new float[rawData.length];
-  noseLeftY = new float[rawData.length];
-  
-  noseLeftBezierX = new float[rawData.length];
-   noseLeftBezierZ = new float[rawData.length];
-    noseLeftBezierY = new float[rawData.length];
-  
-  
-  frontLeftX = new float[rawData.length];
-  frontLeftZ = new float[rawData.length];
-  frontLeftY = new float[rawData.length];
-  
-  frontLeftBezierX = new float[rawData.length];
-  frontLeftBezierZ = new float[rawData.length];
-  frontLeftBezierY = new float[rawData.length];
-  
-  
-  
-   for (int i = 0; i < allCoordinates.size(); i++) {
-    Coordinate thisC = allCoordinates.get(i);
-    
-    //back right
-    pushMatrix();
-      float[] axis = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-20,-1.5,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(20,-1.5,0);
-      }
-//
-//      fill(0,222,0);
-//      box(1,1,1);      
-      
 
-      float x = modelX(0, 0, 0);
-      float y = modelY(0, 0, 0);
-      float z = modelZ(0, 0, 0);
-      
-      backRightX[i] = x;
-      backRightZ[i] = y;
-      backRightY[i] = z;
- 
-    popMatrix();
-    
-    
-    // back right bezier
-    pushMatrix();
-      float[] axis5 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis5[0], -axis5[1], -axis5[3], -axis5[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-20,-1.5,4);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(20,-1.5,-4);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-      
-      float x5 = modelX(0, 0, 0);
-      float y5 = modelY(0, 0, 0);
-      float z5 = modelZ(0, 0, 0);
-      
-      backRightBezierX[i] = x5;
-      backRightBezierZ[i] = y5;
-      backRightBezierY[i] = z5;
-      
-      
-      
-    popMatrix();
-    
-    // Tail right
-    pushMatrix();
-      float[] axis2 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis2[0], -axis2[1], -axis2[3], -axis2[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-12.5,0,5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(12.5,0,-5);
-      } 
-
-//      fill(0,222,0);
-//      box(1,1,1);      
-      
-      
-      float x2 = modelX(0, 0, 0);
-      float y2 = modelY(0, 0, 0);
-      float z2 = modelZ(0, 0, 0);
-      
-      tailRightX[i] = x2;
-      tailRightZ[i] = y2;
-      tailRightY[i] = z2;
-      
-    popMatrix();
-    
-    
-    // Tail right CENTER
-    pushMatrix();
-      float[] axis17 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis17[0], -axis17[1], -axis17[3], -axis17[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-12.5,0,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(12.5,0,0);
-      } 
-
-//      fill(0,222,0);
-//      box(1,1,1);      
-      
-      
-      float x17 = modelX(0, 0, 0);
-      float y17 = modelY(0, 0, 0);
-      float z17 = modelZ(0, 0, 0);
-      
-      tailRightCenterX[i] = x17;
-      tailRightCenterZ[i] = y17;
-      tailRightCenterY[i] = z17;
-      
-    popMatrix();
-    
-    
-        // Tail right CENTER BEZIER
-    pushMatrix();
-      float[] axis18 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis18[0], -axis18[1], -axis18[3], -axis18[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-16.25,0,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(16.25,0,0);
-      } 
-
-//      fill(0,222,0);
-//      box(1,1,1);      
-      
-      
-      float x18 = modelX(0, 0, 0);
-      float y18 = modelY(0, 0, 0);
-      float z18 = modelZ(0, 0, 0);
-      
-      tailRightBezierCenterX[i] = x18;
-      tailRightBezierCenterZ[i] = y18;
-      tailRightBezierCenterY[i] = z18;
-      
-    popMatrix();
-    
-    
-    
-    // tail Bezier
-    pushMatrix();
-      float[] axis6 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis6[0], -axis6[1], -axis6[3], -axis6[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-16.25,0,5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(16.25,0,-5);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-
-      float x6 = modelX(0, 0, 0);
-      float y6 = modelY(0, 0, 0);
-      float z6 = modelZ(0, 0, 0);
-      
-      tailRightBezierX[i] = x6;
-      tailRightBezierZ[i] = y6;
-      tailRightBezierY[i] = z6;
-      
-     popMatrix();
-    
-    // nose right
-   pushMatrix();
-      float[] axis3 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis3[0], -axis3[1], -axis3[3], -axis3[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(12.5,0,5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-12.5,0,-5);
-      } 
-      
-      
-      
-      float x3 = modelX(0, 0, 0);
-      float y3 = modelY(0, 0, 0);
-      float z3 = modelZ(0, 0, 0);
-      
-      noseRightX[i] = x3;
-      noseRightZ[i] = y3;
-      noseRightY[i] = z3;
-      
-      
-      
-   popMatrix();
-   
-   
-   // nose right CENTER
-   pushMatrix();
-      float[] axis19 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis19[0], -axis19[1], -axis19[3], -axis19[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(12.5,0,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-12.5,0,0);
-      } 
-      
-//      fill(0,222,0);
-//      box(1,1,1);   
-      
-      float x19 = modelX(0, 0, 0);
-      float y19 = modelY(0, 0, 0);
-      float z19 = modelZ(0, 0, 0);
-      
-      noseRightCenterX[i] = x19;
-      noseRightCenterZ[i] = y19;
-      noseRightCenterY[i] = z19;
-       
-   popMatrix();
-   
-     // nose right Center bezier
-   pushMatrix();
-      float[] axis20 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis20[0], -axis20[1], -axis20[3], -axis20[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(16.25,0,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-16.25,0,0);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-      
-      float x20 = modelX(0, 0, 0);
-      float y20 = modelY(0, 0, 0);
-      float z20 = modelZ(0, 0, 0);
-      
-      noseRightBezierCenterX[i] = x20;
-      noseRightBezierCenterZ[i] = y20;
-      noseRightBezierCenterY[i] = z20;
-      
-   popMatrix();
-   
-   
-   
-   
-   // nose right bezier
-   pushMatrix();
-      float[] axis7 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis7[0], -axis7[1], -axis7[3], -axis7[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(16.25,0,5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-16.25,0,-5);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-      
-      float x7 = modelX(0, 0, 0);
-      float y7 = modelY(0, 0, 0);
-      float z7 = modelZ(0, 0, 0);
-      
-      noseRightBezierX[i] = x7;
-      noseRightBezierZ[i] = y7;
-      noseRightBezierY[i] = z7;
-      
-   popMatrix();
-   
-   
-   // frontRight
-   pushMatrix();
-      float[] axis4 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis4[0], -axis4[1], -axis4[3], -axis4[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(20,-1.5,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-20,-1.5,0);
-      }
-      
-     
-
-      float x4 = modelX(0, 0, 0);
-      float y4 = modelY(0, 0, 0);
-      float z4 = modelZ(0, 0, 0);
-      
-      frontRightX[i] = x4;
-      frontRightZ[i] = y4;
-      frontRightY[i] = z4;
- 
-    popMatrix();
-    
-    // front Right bezier
-    pushMatrix();
-      float[] axis8 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis8[0], -axis8[1], -axis8[3], -axis8[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(20,-1.5,4);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-20,-1.5,-4);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-
-      float x8 = modelX(0, 0, 0);
-      float y8 = modelY(0, 0, 0);
-      float z8 = modelZ(0, 0, 0);
-
-     frontRightBezierX[i] = x8;
-    frontRightBezierZ[i] = y8;
-   frontRightBezierY[i] = z8; 
-      
-    popMatrix();
-    
-    
-    
-    // left side --------------------------------------------------------------------------------------------------------------------------------------
-    
-    //back Left
-    pushMatrix();
-      float[] axis9 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis9[0], -axis9[1], -axis9[3], -axis9[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-20,-1.5,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(20,-1.5,0);
-      }
-      
-//      fill(222,222,0);
-//      box(1,1,1);      
-      
-
-      float x9 = modelX(0, 0, 0);
-      float y9 = modelY(0, 0, 0);
-      float z9 = modelZ(0, 0, 0);
-      
-      backLeftX[i] = x9;
-      backLeftZ[i] = y9;
-      backLeftY[i] = z9;
- 
-    popMatrix();
-    
-//    
-//    // back right bezier
-    pushMatrix();
-      float[] axis10 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis10[0], -axis10[1], -axis10[3], -axis10[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-20,-1.5,-4);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(20,-1.5,4);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-      
-      float x10 = modelX(0, 0, 0);
-      float y10 = modelY(0, 0, 0);
-      float z10 = modelZ(0, 0, 0);
-//      
-      backLeftBezierX[i] = x10;
-      backLeftBezierZ[i] = y10;
-      backLeftBezierY[i] = z10;
-      
-      
-      
-    popMatrix();
-//    
-//    // Tail Left
-    pushMatrix();
-      float[] axis11 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis11[0], -axis11[1], -axis11[3], -axis11[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-12.5,0,-5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(12.5,0,5);
-      } 
-      
-//      fill(0,222,0);
-//      box(1,1,1);      
-      
-      float x11 = modelX(0, 0, 0);
-      float y11 = modelY(0, 0, 0);
-      float z11 = modelZ(0, 0, 0);
-//      
-      tailLeftX[i] = x11;
-      tailLeftZ[i] = y11;
-      tailLeftY[i] = z11;
-      
-    popMatrix();
-//    
-//    
-//    // tail Bezier
-    pushMatrix();
-      float[] axis12 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis12[0], -axis12[1], -axis12[3], -axis12[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(-16.25,0,-5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(16.25,0,5);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-
-      float x12 = modelX(0, 0, 0);
-      float y12 = modelY(0, 0, 0);
-      float z12 = modelZ(0, 0, 0);
-//      
-      tailLeftBezierX[i] = x12;
-      tailLeftBezierZ[i] = y12;
-      tailLeftBezierY[i] = z12;
-      
-     popMatrix();
-//    
-//    // nose right
-   pushMatrix();
-      float[] axis13 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis13[0], -axis13[1], -axis13[3], -axis13[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(12.5,0,-5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-12.5,0,5);
-      } 
-      
-      
-      
-      float x13 = modelX(0, 0, 0);
-      float y13 = modelY(0, 0, 0);
-      float z13 = modelZ(0, 0, 0);
-      
-      noseLeftX[i] = x13;
-      noseLeftZ[i] = y13;
-      noseLeftY[i] = z13;
-      
-      
-      
-   popMatrix();
-//   
-   // nose left bezier
-   pushMatrix();
-      float[] axis14 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis14[0], -axis14[1], -axis14[3], -axis14[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(16.25,0,-5);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-16.25,0,5);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-      
-      float x14 = modelX(0, 0, 0);
-      float y14 = modelY(0, 0, 0);
-      float z14 = modelZ(0, 0, 0);
-      
-      noseLeftBezierX[i] = x14;
-      noseLeftBezierZ[i] = y14;
-      noseLeftBezierY[i] = z14;
-      
-   popMatrix();
-//   
-//   
-   // front Left
-   pushMatrix();
-      float[] axis15 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis15[0], -axis15[1], -axis15[3], -axis15[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(20,-1.5,0);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-20,-1.5,0);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-
-      float x15 = modelX(0, 0, 0);
-      float y15 = modelY(0, 0, 0);
-      float z15 = modelZ(0, 0, 0);
-      
-      frontLeftX[i] = x15;
-      frontLeftZ[i] = y15;
-      frontLeftY[i] = z15;
- 
-    popMatrix();
-//    
-    // front left bezier
-    pushMatrix();
-      float[] axis16 = thisC.quat.toAxisAngle();
-      translate(thisC.loc.x*70, thisC.loc.z*70, thisC.loc.y*70);
-      rotate(axis16[0], -axis16[1], -axis16[3], -axis16[2]);
-      
-      if (thisC.c180 == false ) {
-        translate(20,-1.5,-4);
-      } else if (thisC.c180 == true ) {
-        // nose left
-        translate(-20,-1.5,4);
-      }
-      
-//      fill(0,222,0);
-//      box(1,1,1);
-
-      float x16 = modelX(0, 0, 0);
-      float y16 = modelY(0, 0, 0);
-      float z16 = modelZ(0, 0, 0);
-
-     frontLeftBezierX[i] = x16;
-    frontLeftBezierZ[i] = y16;
-   frontLeftBezierY[i] = z16; 
-      
-    popMatrix();
-   
-   } 
-}
 
 void drawSkateboards(){
   
@@ -1383,7 +776,209 @@ void drawBoxes() {
   }
 }
 
+void drawPark(){
+    // base
+  beginShape();
+  vertex(0,0,0);
+  vertex(0,0,0-91.2);
+  vertex(0-91.2,0, 0-91.2); 
+  vertex(0-91.2,0, -5000);
+  vertex(1013+171,0, -5000);
+  vertex(1013+171,0, 0-91.2);
+  vertex(1013,0, 0-91.2);
+  vertex(1013,0, 0);
+  endShape(CLOSE);
+  
+  // base left wall
+  beginShape();
+   vertex(0-91.2,0, 0-91.2); 
+    vertex(0-91.2,0, -5000); 
+    vertex(0-91.2,49.5*5, -5000); 
+    vertex(0-91.2,49.5*5, 0-91.2); 
+  endShape(CLOSE);
+  
+  // base right wall
+  beginShape();
+   vertex(1013+171,0, 0-91.2); 
+    vertex(1013+171,0, -5000); 
+    vertex(1013+171,49.5*5, -5000); 
+    vertex(1013+171,49.5*5, 0-91.2); 
+  endShape(CLOSE);
+  
+  // base back wall
+  beginShape();
+    vertex(0-91.2,0, -5000);
+    vertex(0-91.2,49.5*5, -5000);
+    vertex(1013+171,49.5*5, -5000);
+    vertex(1013+171,0, -5000);
+  endShape(CLOSE);
+  
+  // base bottom wall
+  beginShape();
+    vertex(0-91.2,49.5*5, -5000);
+    vertex(1013+171,49.5*5, -5000);
+    vertex(1013+171,49.5*5, 133.2*4);
+    vertex(0-91.2,49.5*5, 133.2*4);
+  endShape(CLOSE);
+  
+  // first step -----------------------------------------------------------------
+  beginShape();
+    vertex(0, 0,0);
+    vertex(1013,0,0);
+    vertex(1013,49.5,0);
+    vertex(0,49.5,0);
+  endShape(CLOSE);
+  
+  // SECOND STEP
+  beginShape();
+  vertex(0,49.5,0);
+  vertex(1013,49.5,0);
+  vertex(1013, 49.5, 133.2);
+  vertex(0,49.5,133.2);
+  endShape(CLOSE);
+  
+  beginShape();
+  vertex(0, 49.5,133.2);
+    vertex(1013,49.5,133.2);
+    vertex(1013,49.5*2,133.2);
+    vertex(0,49.5*2,133.2);
+  endShape(CLOSE);
+  
+  //THIRD STEP
+   beginShape();
+  vertex(0,49.5*2,133.2);
+  vertex(1013,49.5*2,133.2);
+  vertex(1013, 49.5*2, 133.2*2);
+  vertex(0,49.5*2,133.2*2);
+  endShape(CLOSE);
+  
+  beginShape();
+  vertex(0, 49.5*2,133.2*2);
+    vertex(1013,49.5*2,133.2*2);
+    vertex(1013,49.5*3,133.2*2);
+    vertex(0,49.5*3,133.2*2);
+  endShape(CLOSE);
+  
+  // FOURTH STEP
+   beginShape();
+  vertex(0,49.5*3,133.2*2);
+  vertex(1013,49.5*3,133.2*2);
+  vertex(1013, 49.5*3, 133.2*3);
+  vertex(0,49.5*3,133.2*3);
+  endShape(CLOSE);
+  
+  beginShape();
+  vertex(0, 49.5*3,133.2*3);
+    vertex(1013,49.5*3,133.2*3);
+    vertex(1013,49.5*4,133.2*3);
+    vertex(0,49.5*4,133.2*3);
+  endShape(CLOSE);
+  
+  // FIFTH STEP
+   beginShape();
+  vertex(0,49.5*4,133.2*3);
+  vertex(1013,49.5*4,133.2*3);
+  vertex(1013, 49.5*4, 133.2*4);
+  vertex(0,49.5*4,133.2*4);
+  endShape(CLOSE);
+  
+  beginShape();
+  vertex(0, 49.5*4,133.2*4);
+    vertex(1013,49.5*4,133.2*4);
+    vertex(1013,49.5*5,133.2*4);
+    vertex(0,49.5*5,133.2*4);
+  endShape(CLOSE);
+  
+  
+  // LEFT EDGE -----------------------------------------------------------------
+  
+  // From down to up // left right
+  beginShape();
+    vertex(0-91.2, 49.5*5, 0-91.2);
+    //vertex(0-91.2, 0-205.5, 0-91.2);
+    vertex(0-91.2,0-205.5, 0-91.2);
+   vertex(0-91.2,49.5*5-205.5,133.2*4+53.34); 
+   vertex(0-91.2,49.5*5,133.2*4+53.34);  
+  endShape(CLOSE);
+  
+   beginShape();
+    vertex(0, 49.5*5, 0-91.2);
+    vertex(0,0-205.5, 0-91.2);
+   vertex(0,49.5*5-205.5,133.2*4+53.34); 
+   vertex(0,49.5*5,133.2*4+53.34);  
+  endShape(CLOSE);
+  
+  // Back wall
+  beginShape();
+  vertex(0-91.2, 49.5*5, 0-91.2);
+  vertex(0-91.2, 0-205.5, 0-91.2);
+  vertex(0, 0-205.5, 0-91.2);
+  vertex(0, 49.5*5, 0-91.2);
+  vertex(0-91.2, 49.5*5, 0-91.2);
+  endShape();
 
+  // front wall
+  beginShape();
+    vertex(0-91.2, 49.5*5, 133.2*4+53.34);
+    vertex(0-91.2, 49.5*5-205.5, 133.2*4+53.34);
+    vertex(0, 49.5*5-205.5, 133.2*4+53.34);
+    vertex(0, 49.5*5, 133.2*4+53.34);
+    vertex(0-91.2, 49.5*5, 133.2*4+53.34);
+  endShape();
+  
+
+  // top Wall
+  beginShape();
+    vertex(0-91.2, 0-205.5, 0-91.2);
+    vertex(0, 0-205.5, 0-91.2);
+    vertex(0, 49.5*5-205.5, 133.2*4+53.34);
+    vertex(0-91.2, 49.5*5-205.5, 133.2*4+53.34);
+  endShape();
+  
+   // RIGHT EDGE -----------------------------------------------------------------
+   // left wall
+   beginShape();
+     vertex(1013,49.5*5, 0-91.2); 
+     vertex(1013,0-205.5, 0-91.2);
+     vertex(1013, 49.5*5-205.5,133.2*4+53.34);
+     vertex(1013,49.5*5,133.2*4+53.34); 
+     vertex(1013,49.5*5, 0-91.2); 
+   endShape();
+   
+   // right wall
+   beginShape();
+     vertex(1013+171,49.5*5, 0-91.2); 
+     vertex(1013+171,0-205.5, 0-91.2);
+     vertex(1013+171, 49.5*5-205.5,133.2*4+53.34);
+     vertex(1013+171,49.5*5,133.2*4+53.34); 
+     vertex(1013+171,49.5*5, 0-91.2); 
+   endShape();
+   
+   // back wall
+   beginShape();
+     vertex(1013,49.5*5, 0-91.2); 
+     vertex(1013,0-205.5, 0-91.2);
+     vertex(1013+171,0-205.5, 0-91.2);
+     vertex(1013+171,49.5*5, 0-91.2);
+   endShape(CLOSE);
+   
+   // FRONT WALL
+   beginShape();
+   vertex(1013,49.5*5,133.2*4+53.34); 
+   vertex(1013, 49.5*5-205.5,133.2*4+53.34);
+   vertex(1013+171, 49.5*5-205.5,133.2*4+53.34);
+   vertex(1013+171,49.5*5,133.2*4+53.34); 
+   endShape(CLOSE);
+   
+   // top wall
+    beginShape();
+      vertex(1013,0-205.5, 0-91.2);
+      vertex(1013+171,0-205.5, 0-91.2);
+      vertex(1013+171, 49.5*5-205.5,133.2*4+53.34);
+      vertex(1013, 49.5*5-205.5,133.2*4+53.34);
+      
+    endShape(CLOSE);
+}
 
 
 void gui() {

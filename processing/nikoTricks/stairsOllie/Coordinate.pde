@@ -12,7 +12,7 @@ class Coordinate {
   boolean cAccelerating;
   boolean cStopping;
   boolean cManual;
-  
+  boolean noseDown;
   
   // Create shapes
   // TOP 
@@ -203,27 +203,21 @@ class Coordinate {
       translate(loc.x*420,loc.z*420, loc.y*420);
       float[] axis = quat.toAxisAngle();
      
-     // translate(-20,5,0);
-      
-      rotate(axis[0], -axis[1], -axis[3], -axis[2]);
-      
-      // rotateX(-PI/2);
-     //  translate(33.5, 0,0);
+//       if ( noseDown == false ) {
+////          translate(-75,0,0);
+//          println("nose up");
+//          rotate(axis[0], -axis[1], -axis[3], -axis[2]);
+//          translate(75,0,0);
+//       } else if (noseDown == true) {
+//         rotate(axis[0], -axis[1], -axis[3], -axis[2]);
+//         translate(75,0,0);
+//        println("nose down");  
+////          rotate(axis[0], -axis[1], -axis[3], -axis[2]);
+////         // translate(-75,0,0);
+//       }
       strokeWeight(1);
-       //stroke(0);
-      // noStroke();
-//      if(cJumping) {
-//
-//        //fill(190, 190, 0); 
-//        fill(random(20, 60),240);
-//      } else if (cLanding) {
-//        //fill(0); 
-//      } else {
-//        //fill(random(220, 240),100);
-//        //fill(255, 220);
-//        //fill(0);
-//      }
 
+rotate(axis[0], -axis[1], -axis[3], -axis[2]);
 
 
 
@@ -284,7 +278,10 @@ class Coordinate {
  
  }  if (cJumping == true || cManual == true || cGrinding == true) { // -----------------------------------------------------------------
    
-   
+     float x = modelX(0, 0, 0);
+      float y = modelY(0, 0, 0);
+      float z = modelZ(0, 0, 0);
+     // println(x + " " + y + " " + z);
     //noFill();
    // start with stroke
    topRightStroke.setFill(false);
