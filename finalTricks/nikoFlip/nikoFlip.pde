@@ -13,8 +13,8 @@ Movie video;
 
 
 
-float totalSpeed = 2.5;
-String csvFile = "mat_180flip_2_edit.csv";
+float totalSpeed = 3.5;
+String csvFile = "nikoFlip.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -71,7 +71,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.285; // for ollie180
+float firstJumpSpeed =-0.8; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -195,7 +195,7 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
 
-  name = loadImage("flip180.png");
+  name = loadImage("kickflip.png");
   
   //video = new Movie(this, "ollie180.mov");
   //video.loop();

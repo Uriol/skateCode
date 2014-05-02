@@ -14,7 +14,7 @@ Movie video;
 
 
 float totalSpeed = 2.5;
-String csvFile = "mat_180flip_2_edit.csv";
+String csvFile = "halfCab.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -71,7 +71,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.285; // for ollie180
+float firstJumpSpeed = 0.58; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -195,7 +195,7 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
 
-  name = loadImage("flip180.png");
+  name = loadImage("halfCab.png");
   
   //video = new Movie(this, "ollie180.mov");
   //video.loop();
@@ -366,7 +366,7 @@ void onGround(){
     }
     
    // c.cAcceleratingColor = acceleratingColor;
-    c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
+    c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k] );
     if (plus180 == true || minus180 == true) { c.c180 = true;}
     //c.YPR.add(totalAngleDifference*-1,0,0);
     allCoordinates.add(c);
@@ -439,7 +439,7 @@ void calculateJump(){
   
   c.cAcceleratingColor = acceleratingColor;
   prev_zPosition = zPosition;
-  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1);
+  c.quat = new Quaternion().createFromEuler(pitch[k],totalAngleDifference,roll[k]);
   c.cJumping = jumping;
   allCoordinates.add(c);
   
@@ -519,7 +519,7 @@ void drawBoxes() {
   if ( boxCounter >= allCoordinates.size()) {
     boxCounter = 0;
   }
-  
+//  
 //  for ( int i = 1; i < boxCounter; i++) {
 //  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
 //    Coordinate c = allCoordinates.get(i);
@@ -527,7 +527,7 @@ void drawBoxes() {
 //    //drawSkateboards();
 //      c.displayGround(); 
 //  } 
-//delay(50); 
+//delay(200); 
 
   for(Coordinate c : allCoordinates) {
     

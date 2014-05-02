@@ -13,8 +13,8 @@ Movie video;
 
 
 
-float totalSpeed = 2.5;
-String csvFile = "mat_180flip_2_edit.csv";
+float totalSpeed = 3.5;
+String csvFile = "noseManual.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
 
@@ -65,15 +65,15 @@ float[] roll;
 
 
 // booleans
-boolean jumping, landing, stillJumping, plus180, minus180;
+boolean jumping, landing, stillJumping, plus180, minus180, grinding, ground;
 
 // jump booleans
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = 0.285; // for ollie180
+float firstJumpSpeed = -1.5; // for ollie180
 //float firstJumpSpeed = 1;
-float secondJumpSpeed = -3; 
+float secondJumpSpeed = -3.06; 
 float thirdJumpSpeed = 1;
 float fourthJumpSpeed = -3.5;
 
@@ -195,9 +195,9 @@ void setup() {
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
 
-  name = loadImage("flip180.png");
+  name = loadImage("noseManual.png");
   
-  //video = new Movie(this, "ollie180.mov");
+ // video = new Movie(this, "ollie180.mov");
   //video.loop();
   
 
@@ -234,7 +234,20 @@ void draw() {
   blendMode(BLEND);
 
 
-    
+
+
+pushMatrix();
+
+   translate(4000 ,27,-725);
+ // translate(500,0,0);
+  rotateY(3.4);
+  //fill(25);
+  noFill();
+  stroke(255);
+  drawPark();
+  popMatrix();
+  
+  
    drawBoxes();
   
    // TRICK NAME
@@ -294,6 +307,7 @@ void calculatePositions(){
       
       jumping = true;
       landing = false;
+      grinding = false;
    }
    
     if (jumping == true ) {
@@ -304,19 +318,51 @@ void calculatePositions(){
       calculateLanding();
     }
     
-    if (jumping == false && landing == false){
+    if (jumping == false && landing == false && grinding == false){
       onGround();
     }
+    
+    if (grinding == true){ onGrind();}
     
   }
   
 }
 
+// calculate grind
+void onGrind(){
+  ground = false;
+  grinding = true;
+  jumping = false;
+  //println("grinding");
+  
+  // calculate speeds
+   totalAngleDifference = yaw[k] - initialYaw;
+  totalAngleDifference = totalAngleDifference*PI/180;
+    
+  xPosition = xInitialPosition + xSpeed*time;
+  xInitialPosition = xPosition;
+  
+  yPosition = yInitialPosition + ySpeed*time;
+  yInitialPosition = yPosition;
+  
+  pitch[k] = pitch[k]*PI/180;
+  roll[k] = roll[k]*PI/180;
+  
+  // Add to coordinate class
+  Coordinate c = new Coordinate();
+  c.loc.add(xPosition, yPosition, zPosition*-1);
+  c.quat = new Quaternion().createFromEuler(pitch[k]*-1,totalAngleDifference,roll[k]*-1 );
+  c.cGrinding = true;
+  c.noseDown = true;
+  allCoordinates.add(c);
+}
+
+
 
 
 void onGround(){
   
-  
+  ground = true;
   
   if ( plus180 == true ) { yaw[k] = yaw[k] + 180; roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1;}
   if ( minus180 == true ) { yaw[k] = yaw[k] - 180;roll[k] = roll[k] *-1; pitch[k] = pitch[k] *-1; }
@@ -373,7 +419,7 @@ void onGround(){
 }
 
 void calculateJump(){
-  
+  ground = true;
   // calculate zSpeed
   if (firstJump == false){
     firstJump = true;
@@ -395,14 +441,24 @@ void calculateJump(){
   }
   
   
- // println("zSpeed:" + zSpeed);
+  
+  
+  //println("zSpeed:" + zSpeed);
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-//  if (zPosition <= 0 ) {
-//    zPosition = zPosition - 0.1;
-//  }
-  println(zPosition);
+   
+   // if goes down it goes faster
+   if (prev_zPosition <= zPosition) {
+    //println("going up");
+    
+  } else if ( prev_zPosition > zPosition) {
+   // println("going down"); 
+    zSpeed = zSpeed-0.05;
+    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
+  }
+
+  //println(zPosition);
   totalAngleDifference = yaw[k] - initialYaw;
   totalAngleDifference = totalAngleDifference*PI/180;
     
@@ -420,19 +476,13 @@ void calculateJump(){
   Coordinate c = new Coordinate();
   c.loc.add(xPosition, yPosition, zPosition*-1);
   
-  if (prev_zPosition <= zPosition) {
-    //c.cGoingUp = true;
-    acceleratingColor = acceleratingColor + 7;
-  } else if ( prev_zPosition > zPosition) {
-    acceleratingColor = acceleratingColor -7;
-    
-  }
+ 
   
   if ( pitch[k] <= previousPitch ) { 
-    //println("nose up"); 
+    println("nose up"); 
     c.noseDown = false;
   } else { 
-   // println("nose down");
+    println("nose down");
     c.noseDown = true;
   };
   
@@ -446,7 +496,7 @@ void calculateJump(){
   
   
   
-  
+  prev_zPosition = zPosition;
   previousPitch = pitch[k];
   
 }
@@ -458,8 +508,8 @@ void calculateLanding(){
   println(zInitialPosition);
   println("calculateLanding");
 
-    if (firstJump == true && firstJumpLanding == false) { firstJumpLanding = true;println("firstJump" + firstJump);};
-    if (secondJump == true && secondJumpLanding == false) { secondJumpLanding = true; println("secondJump" + secondJump); };
+    if (firstJump == true && firstJumpLanding == false) { firstJumpLanding = true;println("firstJump" + firstJump);grinding = true;};
+    if (secondJump == true && secondJumpLanding == false) { secondJumpLanding = true; println("secondJump" + secondJump); grinding = false;};
     if (thirdJump == true && thirdJumpLanding == false ) { thirdJumpLanding = true; println("thirdJump" + thirdJump); };
     if (fourthJump == true && fourthJumpLanding == false ) { fourthJumpLanding = true; println("fourthJump" + fourthJump);};
 
@@ -527,7 +577,7 @@ void drawBoxes() {
 //    //drawSkateboards();
 //      c.displayGround(); 
 //  } 
-//delay(50); 
+// delay(15); 
 
   for(Coordinate c : allCoordinates) {
     
@@ -536,7 +586,81 @@ void drawBoxes() {
   }
 }
 
-
+void drawPark(){
+  stroke(220);
+  noFill();
+  // small module start from bottom left
+  //base
+  beginShape();
+    vertex(0,0,0);
+    vertex(1462.8,0,0);
+    vertex(1462.8,0,366);
+    vertex(0,0,366);
+    vertex(0,0,0);
+  endShape();
+  
+  // top
+  beginShape();
+    vertex(0,-38,0);
+    vertex(1462.8,-38,0);
+    vertex(1462.8,-38,366);
+    vertex(0,-38,366);
+    vertex(0,-38,0);
+  endShape();
+  
+  // left
+  beginShape();
+    vertex(0,0,0);
+    vertex(0,-38, 0);
+    vertex(0, -38, 366);
+    vertex(0,0,366);
+  endShape();
+  
+   // right
+  beginShape();
+    vertex(1462.8,0,0);
+    vertex(1462.8,-38, 0);
+    vertex(1462.8, -38, 366);
+    vertex(1462.8,0,366);
+  endShape();
+  
+  // big module
+  // base
+  beginShape();
+    vertex(-445.8, 0, -183);
+    vertex(1462.8+445.8, 0, -183);
+    vertex(1462.8+445.8, 0, 0);
+    vertex(-445.8, 0, 0);
+    vertex(-445.8, 0, -183);
+  endShape();
+  
+  // top
+  beginShape();
+    vertex(-445.8, -152.4, -183);
+    vertex(1462.8+445.8, -152.4, -183);
+    vertex(1462.8+445.8, -152.4, 0);
+    vertex(-445.8, -152.4, 0);
+    vertex(-445.8, -152.4, -183);
+  endShape();
+  
+  // left
+  beginShape();
+  vertex(-445.8, 0, -183);
+  vertex(-445.8, -152.4, -183);
+  vertex(-445.8, -152.4, 0);
+  vertex(-445.8, 0, 0);
+  vertex(-445.8, 0, -183);
+  endShape();
+  
+  // right
+  beginShape();
+  vertex(1462.8+445.8, 0, -183);
+  vertex(1462.8+445.8, -152.4, -183);
+  vertex(1462.8+445.8, -152.4, 0);
+  vertex(1462.8+445.8, 0, 0);
+  vertex(1462.8+445.8, 0, -183);
+  endShape();
+}
 
 void gui() {
   cam.beginHUD();
