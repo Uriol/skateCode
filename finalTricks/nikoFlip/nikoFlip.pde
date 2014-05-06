@@ -13,7 +13,7 @@ Movie video;
 
 
 
-float totalSpeed = 3.5;
+float totalSpeed = 3.8;
 String csvFile = "nikoFlip.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
@@ -71,7 +71,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed =-0.8; // for ollie180
+float firstJumpSpeed =-1.39; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -197,8 +197,8 @@ void setup() {
 
   name = loadImage("kickflip.png");
   
-  //video = new Movie(this, "ollie180.mov");
-  //video.loop();
+  video = new Movie(this, "flip.mov");
+  video.loop();
   
 
   rawData = loadStrings(csvFile);
@@ -242,9 +242,12 @@ cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
 
-//cam.beginHUD();
-//image(video, 0,0);
-//cam.endHUD();
+cam.beginHUD();
+fill(25);
+noStroke();
+rect(width-380, 20, 360,220); 
+image(video, width-360,40);
+cam.endHUD();
 
 }
 
@@ -514,12 +517,12 @@ void checkPreviousAccels(){
 
 
 void drawBoxes() {
-  boxCounter++;
-  
-  if ( boxCounter >= allCoordinates.size()) {
-    boxCounter = 0;
-  }
-  
+//  boxCounter++;
+//  
+//  if ( boxCounter >= allCoordinates.size()) {
+//    boxCounter = 0;
+//  }
+//  
 //  for ( int i = 1; i < boxCounter; i++) {
 //  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
 //    Coordinate c = allCoordinates.get(i);

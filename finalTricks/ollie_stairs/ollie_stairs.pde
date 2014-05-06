@@ -197,8 +197,8 @@ void setup() {
 
   name = loadImage("ollie.png");
   
-  video = new Movie(this, "ollie180.mov");
-  //video.loop();
+  video = new Movie(this, "ollieStairs960.mov");
+  video.loop();
   
 
   rawData = loadStrings(csvFile);
@@ -255,9 +255,12 @@ cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
 
-//cam.beginHUD();
-//image(video, 0,0);
-//cam.endHUD();
+cam.beginHUD();
+fill(25);
+noStroke();
+rect(width-380, 20, 360,220); 
+image(video, width-360,40,320,180);
+cam.endHUD();
 
 }
 
@@ -537,20 +540,20 @@ void drawBoxes() {
     boxCounter = 0;
   }
   
-//  for ( int i = 1; i < boxCounter; i++) {
-//  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
-//    Coordinate c = allCoordinates.get(i);
-//    
-//    //drawSkateboards();
-//      c.displayGround(); 
-//  } 
+  for ( int i = 1; i < boxCounter; i++) {
+  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
+    Coordinate c = allCoordinates.get(i);
+    
+    //drawSkateboards();
+      c.displayGround(); 
+  } 
 // delay(15); 
 
-  for(Coordinate c : allCoordinates) {
-    
-    c.displayGround();
-     
-  }
+//  for(Coordinate c : allCoordinates) {
+//    
+//    c.displayGround();
+//     
+//  }
 }
 
 void drawPark(){

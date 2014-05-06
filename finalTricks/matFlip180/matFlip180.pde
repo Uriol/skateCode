@@ -197,8 +197,8 @@ void setup() {
 
   name = loadImage("flip180.png");
   
-  //video = new Movie(this, "ollie180.mov");
-  //video.loop();
+  video = new Movie(this, "flip180_960.mov");
+  video.loop();
   
 
   rawData = loadStrings(csvFile);
@@ -242,9 +242,12 @@ cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
 
-//cam.beginHUD();
-//image(video, 0,0);
-//cam.endHUD();
+cam.beginHUD();
+fill(25);
+noStroke();
+rect(width-380, 20, 360,220); 
+image(video, width-360,40, 320,180);
+cam.endHUD();
 
 }
 
