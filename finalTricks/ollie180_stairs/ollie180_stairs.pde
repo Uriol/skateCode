@@ -11,9 +11,14 @@ PImage img;
 PImage name;
 Movie video;
 
+PImage jumpAltitude;
+PImage totalAltitude;
+PImage airtimeNumber;
+PImage speed;
 
 
-float totalSpeed = 5;
+
+float totalSpeed = 4.2;
 String csvFile = "8_ollie180Stairs_FINAL_2.csv";
 
 ArrayList<Coordinate> allCoordinates = new ArrayList<Coordinate>();
@@ -71,7 +76,7 @@ boolean jumping, landing, stillJumping, plus180, minus180;
 boolean startJump;
 boolean firstJump, secondJump, thirdJump, fourthJump;
 boolean firstJumpLanding, secondJumpLanding, thirdJumpLanding, fourthJumpLanding;
-float firstJumpSpeed = -2.17; // for ollie180
+float firstJumpSpeed = -0.8; // for ollie180
 //float firstJumpSpeed = 1;
 float secondJumpSpeed = -3; 
 float thirdJumpSpeed = 1;
@@ -179,7 +184,7 @@ float[] frontLeftBezierZ;
 float[] frontLeftBezierY;
 
 
-
+PFont myFont;
 // shapes --------------------------------
 PShape topTail;
 
@@ -190,7 +195,7 @@ int k;
 String[] rawData;
 
 void setup() {
-  size(1344, 760, OPENGL);
+  size(1440, 850, OPENGL);
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
@@ -205,7 +210,12 @@ void setup() {
   parseTextFile(csvFile);
   calculatePositions();
 // calculateSkateBoards();
- 
+ myFont = loadFont("Futura-CondensedBold-48.vlw");
+  jumpAltitude = loadImage("jumpAltitude.png");
+  totalAltitude = loadImage("totalAltitude.png");
+  airtimeNumber = loadImage("airtimeNumber.png");
+  
+ speed = loadImage("speed.png");
 
 }
 
@@ -238,9 +248,10 @@ void draw() {
 
 pushMatrix();
 
-   translate(5260 ,27,1400);
+   //translate(5260 ,27,1400);
+   translate(1650 ,27,-200);
  // translate(500,0,0);
-  rotateY(1.4);
+  rotateY(2.15);
   //fill(25);
   noFill();
   stroke(255);
@@ -254,7 +265,7 @@ pushMatrix();
 cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
-
+gui();
 cam.beginHUD();
 fill(25);
 noStroke();
@@ -415,9 +426,14 @@ void calculateJump(){
   airtime = airtime + 0.02;
   //println("airtime:" + airtime);
    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
-//  if (zPosition <= 0 ) {
-//    zPosition = zPosition - 0.1;
-//  }
+if (prev_zPosition <= zPosition) {
+    //println("going up");
+    
+  } else if ( prev_zPosition > zPosition) {
+    println("going down"); 
+    zSpeed = zSpeed-0.03;
+    zPosition = zInitialPosition + zSpeed*airtime - 0.5*9.8*airtime*airtime ;
+  }
   println(zPosition);
   totalAngleDifference = yaw[k] - initialYaw;
   totalAngleDifference = totalAngleDifference*PI/180;
@@ -462,7 +478,7 @@ void calculateJump(){
   
   
   
-  
+  prev_zPosition = zPosition;
   previousPitch = pitch[k];
   
 }
@@ -758,7 +774,65 @@ void drawPark(){
 
 
 void gui() {
-  cam.beginHUD();
-  image(img, 0, 0);
+   cam.beginHUD();
+  
+    noStroke();
+  fill(25);
+  rect(width-400,0,420,height);
+  
+  pushMatrix();
+  translate(0,340,0);
+  
+  // jump altitude
+  pushMatrix();
+  image(jumpAltitude, width-360, 0, 147,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  // jump distance
+   pushMatrix();
+   translate(0,90,0); 
+  image(totalAltitude, width-360, 0, 132,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("TOTAL ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // airtime
+   pushMatrix();
+   translate(0,90*2,0); 
+  image(airtimeNumber, width-360, 0, 134,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("AIRTIME", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // flipSpeed
+   pushMatrix();
+   translate(0,90*3,0); 
+  image(speed, width-360, 0, 170,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("SPEED", width-360, 60); //+16
+  stroke(50);
+  //line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  
+  
+  
+  popMatrix();
+  
   cam.endHUD();
 }

@@ -12,6 +12,11 @@ PImage name;
 Movie video;
 
 
+PImage jumpAltitude;
+PImage jumpDistance;
+PImage airtimeImage;
+PImage flipSpeed;
+PImage backside;
 
 float totalSpeed = 3;
 String csvFile = "heelflip180.csv";
@@ -186,11 +191,11 @@ PShape topTail;
 float acceleratingColor = 0;
 // loops
 int k;
-
+PFont myFont;
 String[] rawData;
 
 void setup() {
-  size(1344, 760, OPENGL);
+  size(1440, 850, OPENGL);
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
@@ -206,7 +211,13 @@ void setup() {
   calculatePositions();
 // calculateSkateBoards();
  
+myFont = loadFont("Futura-CondensedBold-48.vlw");
 
+jumpAltitude = loadImage("jumpAltitude.png");
+jumpDistance = loadImage("jumpDistance.png");
+airtimeImage = loadImage("airtime.png");
+flipSpeed = loadImage("flipSpeed.png");
+backside = loadImage("backside.png");
 }
 
 void draw() {
@@ -241,6 +252,8 @@ void draw() {
 cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
+
+gui();
 
 cam.beginHUD();
 fill(25);
@@ -523,26 +536,94 @@ void drawBoxes() {
     boxCounter = 0;
   }
   
-//  for ( int i = 1; i < boxCounter; i++) {
-//  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
-//    Coordinate c = allCoordinates.get(i);
-//    
-//    //drawSkateboards();
-//      c.displayGround(); 
-//  } 
+  for ( int i = 1; i < boxCounter; i++) {
+  //for (int i = 0; i < allCoordinates.size()-allCoordinates.size()+1; i++) {
+    Coordinate c = allCoordinates.get(i);
+    
+    //drawSkateboards();
+      c.displayGround(); 
+  } 
 //delay(50); 
 
-  for(Coordinate c : allCoordinates) {
-    
-    c.displayGround();
-     
-  }
+//  for(Coordinate c : allCoordinates) {
+//    
+//    c.displayGround();
+//     
+//  }
 }
 
 
 
 void gui() {
   cam.beginHUD();
-  image(img, 0, 0);
+  
+  noStroke();
+  fill(25);
+  rect(width-400,0,420,height);
+  
+  pushMatrix();
+  translate(0,310,0);
+  
+  // jump altitude
+  pushMatrix();
+  image(jumpAltitude, width-360, 0, 147,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  // jump distance
+   pushMatrix();
+   translate(0,90,0); 
+  image(jumpDistance, width-360, 0, 118,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP DISTANCE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // airtime
+   pushMatrix();
+   translate(0,90*2,0); 
+  image(airtimeImage, width-360, 0, 131,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("AIRTIME", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // flipSpeed
+   pushMatrix();
+   translate(0,90*3,0); 
+  image(flipSpeed, width-360, 0, 200,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("FLIP SPEED", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // backside
+   pushMatrix();
+   translate(0,90*4,0); 
+  image(backside, width-360, 0, 82,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("BACKSIDE ROTATION ON AIR", width-360, 60); //+16
+  stroke(50);
+  //line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  popMatrix();
+
+  
   cam.endHUD();
 }

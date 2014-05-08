@@ -11,6 +11,9 @@ PImage img;
 PImage name;
 Movie video;
 
+PImage manualTime;
+PImage manualDistance;
+PImage manualSpeed;
 
 
 float totalSpeed = 3.5;
@@ -189,8 +192,10 @@ int k;
 
 String[] rawData;
 
+PFont myFont;
+
 void setup() {
-  size(1344, 760, OPENGL);
+  size(1440, 850, OPENGL);
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
@@ -205,6 +210,12 @@ void setup() {
   parseTextFile(csvFile);
   calculatePositions();
 // calculateSkateBoards();
+  
+  myFont = loadFont("Futura-CondensedBold-48.vlw");
+  
+  manualTime = loadImage("manualTime.png");
+  manualDistance = loadImage("manualDistance.png");
+  manualSpeed = loadImage("manualSpeed.png");
  
 
 }
@@ -254,7 +265,7 @@ pushMatrix();
 cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
-
+gui();
 cam.beginHUD();
 fill(25);
 noStroke();
@@ -667,6 +678,52 @@ void drawPark(){
 
 void gui() {
   cam.beginHUD();
-  image(img, 0, 0);
+  
+    noStroke();
+  fill(25);
+  rect(width-400,0,420,height);
+  
+  pushMatrix();
+  translate(0,350,0);
+  
+  // manual time
+  pushMatrix();
+  image(manualTime, width-360, 0, 120,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("MANUAL TIME", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  // manual distance
+   pushMatrix();
+   translate(0,90,0); 
+  image(manualDistance, width-360, 0, 120,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("MANUAL DISTANCE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // manual speed
+   pushMatrix();
+   translate(0,90*2,0); 
+  image(manualSpeed, width-360, 0, 172,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("MANUAL SPEED", width-360, 60); //+16
+  stroke(50);
+  //line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+
+  
+  
+  popMatrix();
+  
   cam.endHUD();
 }

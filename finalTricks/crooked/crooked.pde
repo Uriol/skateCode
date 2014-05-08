@@ -7,8 +7,16 @@ import processing.video.*;
 //import processing.opengl.*;
 
 PeasyCam cam;
+PImage gui;
+
 PImage img;
 PImage name;
+
+PImage altitudeNumber;
+PImage grindTime;
+PImage grindSpeed;
+PImage grindDistance;
+
 Movie video;
 
 
@@ -189,13 +197,23 @@ int k;
 
 String[] rawData;
 
+PFont myFont;
+
 void setup() {
-  size(1344, 760, OPENGL);
+  size(1440, 850, OPENGL);
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
+  
+  gui = loadImage("guiTest3.png");
 
   name = loadImage("crooked.png");
+  
+  altitudeNumber = loadImage("altitudeNumber.png");
+  grindTime = loadImage("grindTime.png");
+  grindSpeed = loadImage("grindSpeed.png");
+  grindDistance = loadImage("grindDistance.png");
+
   
   video = new Movie(this, "crooked960.mov");
   video.loop();
@@ -205,7 +223,10 @@ void setup() {
   parseTextFile(csvFile);
   calculatePositions();
 // calculateSkateBoards();
- 
+
+myFont = loadFont("Futura-CondensedBold-48.vlw");
+// String[] fontList = PFont.list();
+// println(fontList);
 
 }
 
@@ -254,7 +275,7 @@ pushMatrix();
 cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
-
+gui();
 cam.beginHUD();
 fill(25);
 noStroke();
@@ -666,6 +687,76 @@ void drawPark(){
 
 void gui() {
   cam.beginHUD();
-  image(img, 0, 0);
+  noStroke();
+  fill(25);
+  rect(width-400,0,420,height);
+  
+
+pushMatrix();
+translate(0,340);
+fill(255);
+//text("Meters", width-260, 0);
+ 
+//  // jump Altitude
+  pushMatrix();
+
+  image(altitudeNumber, width-360, 0, 147,35); // 89
+  textFont(myFont,14);
+  fill(255);
+  //text("METERS", width-255, 35); // 271
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+ 
+ pushMatrix();
+  translate(0,90,0);
+  image(grindTime, width-360, 0, 103,35); // 89
+  textFont(myFont,14);
+  fill(255);
+  //text("METERS", width-255, 35); // 271
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("GRIND TIME", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  
+pushMatrix();
+  translate(0,90*2,0);
+  image(grindSpeed, width-360, 0, 195,35); // 89
+  textFont(myFont,14);
+  fill(255);
+  //text("METERS", width-255, 35); // 271
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("GRIND SPEED", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  pushMatrix();
+  translate(0,90*3,0);
+  image(grindDistance, width-360, 0, 132,35); // 89
+  textFont(myFont,14);
+  fill(255);
+  //text("METERS", width-255, 35); // 271
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("GRIND DISTANCE", width-360, 60); //+16
+  stroke(50);
+  //line(width-360, 75, width-40, 75);
+  popMatrix();
+
+ 
+   
+  
+ popMatrix();
   cam.endHUD();
 }

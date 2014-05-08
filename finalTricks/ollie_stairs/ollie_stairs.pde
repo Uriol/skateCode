@@ -11,6 +11,11 @@ PImage img;
 PImage name;
 Movie video;
 
+PImage jumpAltitude;
+PImage totalAltitude;
+PImage airtimeNumber;
+PImage jumpDistance;
+PImage speed;
 
 
 float totalSpeed = 3.7;
@@ -178,7 +183,7 @@ float[] frontLeftBezierX;
 float[] frontLeftBezierZ;
 float[] frontLeftBezierY;
 
-
+PFont myFont;
 
 // shapes --------------------------------
 PShape topTail;
@@ -190,7 +195,7 @@ int k;
 String[] rawData;
 
 void setup() {
-  size(1344, 760, OPENGL);
+  size(1440, 850, OPENGL);
   //frameRate(200);
   //g3 = (PGraphics3D)g;
   cam = new PeasyCam(this, 500);
@@ -205,7 +210,15 @@ void setup() {
   parseTextFile(csvFile);
   calculatePositions();
 // calculateSkateBoards();
- 
+
+  myFont = loadFont("Futura-CondensedBold-48.vlw");
+  
+  
+  jumpAltitude = loadImage("jumpAltitude.png");
+  totalAltitude = loadImage("totalAltitude.png");
+  airtimeNumber = loadImage("airtimeNumber.png");
+  jumpDistance = loadImage("jumpDistance.png");
+ speed = loadImage("speed.png");
 
 }
 
@@ -254,7 +267,7 @@ pushMatrix();
 cam.beginHUD();
 image(name, 40, height-75);
 cam.endHUD();
-
+gui();
 cam.beginHUD();
 fill(25);
 noStroke();
@@ -762,7 +775,74 @@ void drawPark(){
 
 
 void gui() {
-  cam.beginHUD();
-  image(img, 0, 0);
+    cam.beginHUD();
+  
+    noStroke();
+  fill(25);
+  rect(width-400,0,420,height);
+  
+  pushMatrix();
+  translate(0,310,0);
+  
+  // jump altitude
+  pushMatrix();
+  image(jumpAltitude, width-360, 0, 120,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  // jump distance
+   pushMatrix();
+   translate(0,90,0); 
+  image(totalAltitude, width-360, 0, 133,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("TOTAL ALTITUDE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // airtime
+   pushMatrix();
+   translate(0,90*2,0); 
+  image(airtimeNumber, width-360, 0, 134,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("AIRTIME", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // flipSpeed
+   pushMatrix();
+   translate(0,90*3,0); 
+  image(jumpDistance, width-360, 0, 147,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("JUMP DISTANCE", width-360, 60); //+16
+  stroke(50);
+  line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  // backside
+   pushMatrix();
+   translate(0,90*4,0); 
+  image(speed, width-360, 0, 172,35); // 89
+   textFont(myFont,15);
+   fill(184, 228, 0);
+  text("SPEED", width-360, 60); //+16
+  stroke(50);
+  //line(width-360, 75, width-40, 75);
+  popMatrix();
+  
+  
+  popMatrix();
+  
   cam.endHUD();
 }
